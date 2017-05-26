@@ -2,14 +2,13 @@
 
 SQLite Abstraction of Format Identification Tools (DROID, Siegfried)
 
-Separated code from https://github.com/exponential-decay/droid-siegfried-sqlite-analysis-engine.
+## History
 
-Has been a standalone app from the beginning but may have application for others isolated like this. 
-
-Inspired by [Siegfried's](https://github.com/richardlehane/siegfried) use of namespaces to be generic enough for
+* Separated code from https://github.com/exponential-decay/droid-siegfried-sqlite-analysis-engine.
+* Has been a standalone app from the beginning but may have application for others isolated like this. 
+* Inspired by [Siegfried's](https://github.com/richardlehane/siegfried) use of namespaces to be generic enough for
 a number of format identification tools. 
-
-FIDO identification available but not parsing. Could be on its way but depends on demand. 
+* FIDO identification available but not parsing. Could be on its way but depends on demand. 
 
 ## License
 
