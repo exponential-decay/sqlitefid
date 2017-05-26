@@ -10,7 +10,7 @@ from libs.GenerateBaselineDBClass import GenerateBaselineDB
 from libs.DROIDLoaderClass import DROIDLoader
 from libs.SFLoaderClass import SFLoader
 from libs.FidoLoaderClass import FidoLoader
-from version import SqliteFIDVersion
+from libs.Version import SqliteFIDVersion
 
 def identifyinput(export):
    id = IdentifyExport()
