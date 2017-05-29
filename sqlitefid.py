@@ -23,6 +23,8 @@ def identifyinput(export):
       return handleSFYAML(export)
    elif type == id.FIDOTYPE:
       return handleFIDOCSV(export)
+   elif type == id.SFCSVTYPE:
+      sys.stderr.write("Sigfried CSV. Not currently handled.")
    elif type == id.UNKTYPE:
       sys.stderr.write("Unknown export type.")	
       return None
