@@ -1,4 +1,6 @@
-﻿class ToolMapping:
+﻿# -*- coding: utf-8 -*-
+
+class ToolMapping:
 
     DROID_FILE_MAP = {
         "ID": "INPUT_ID",
