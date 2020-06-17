@@ -223,7 +223,7 @@ class SFYAMLHandler:
                 if self.sectioncount == 1:
                     self.headersection(line)
                 elif self.sectioncount > 1:
-                    if processing == False and len(filedata) > 0:
+                    if processing is False and len(filedata) > 0:
                         self.files.append(self.filesection(filedata))
                         filedata = []
                     else:
@@ -254,7 +254,7 @@ class SFYAMLHandler:
                 iddata[self.FIELDMISMATCH] = False
 
     def getMethod(self, basis, iddata, filedict=False, warning=False):
-        if warning is False and basis != None:
+        if warning is False and basis is not None:
             if self.container_basis_one in basis or self.container_basis_two in basis:
                 iddata[self.FIELDMETHOD] = "Container"
             elif self.byte_basis in basis:
@@ -268,7 +268,7 @@ class SFYAMLHandler:
             else:
                 iddata[self.FIELDMETHOD] = ""
 
-        if warning is True and basis != None:
+        if warning is True and basis is not None:
             if self.filename_only in basis:
                 method = "Filename"
             elif self.extension_only_one in basis:

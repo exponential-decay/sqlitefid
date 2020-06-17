@@ -9,7 +9,7 @@ class PyDateHandler:
     def getYear(self, datestring):
         if datestring != "":
             datestring = self.get_datestring_without_timezone(datestring)
-        if datestring == False:
+        if datestring is False:
             datestring = "None"
         return datestring
 
@@ -41,9 +41,9 @@ class PyDateHandler:
             )
             sys.stderr.write(errstr + "\n")
 
-        if newdate == False:
+        if newdate is False:
             testyear = datestring.split("-")[0]
-            validyear = re.compile("^\d{4}$")
+            validyear = re.compile(r"^\d{4}$")
             if (
                 len(testyear) == 4 and re.search(validyear, testyear) is not None
             ):  # we should have a year

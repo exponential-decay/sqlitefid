@@ -128,7 +128,7 @@ class genericCSVHandler:
                                     break
 
                         # continue with exception and add new dict to primary dict
-                        if MULTIPLE == True:
+                        if MULTIPLE is True:
                             csv_dict[self.DICT_FORMATS] = multilist
                             multilist = []
 
@@ -179,14 +179,13 @@ class droidCSVHandler:
 
     def addYear(self, droidlist):
         for row in droidlist:
-            if row["LAST_MODIFIED"] is not "":
+            if row["LAST_MODIFIED"] == "":
                 row[u"YEAR"] = str(self.getYear(row["LAST_MODIFIED"])).decode("utf-8")
         return droidlist
 
     def removecontainercontents(self, droidlist):
         newlist = []  # naive remove causes loop to skip items
         for row in droidlist:
-            uris = self.getURIScheme(row["URI"])
             if self.getURIScheme(row["URI"]) == "file":
                 newlist.append(row)
         return newlist

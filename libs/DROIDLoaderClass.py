@@ -1,14 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import os
-import sys
-import sqlite3
-import hashlib
-import datetime
-import csv
-from urlparse import urlparse
-from ToolMappingClass import ToolMapping
-from CSVHandlerClass import *
+from .ToolMappingClass import ToolMapping
+from .CSVHandlerClass import droidCSVHandler
 
 
 class DROIDLoader:
@@ -91,7 +84,7 @@ class DROIDLoader:
     def droidDBSetup(self, droidcsv, cursor):
         self.NS_ID = self.setupNamespaceConstants(cursor, droidcsv)
 
-        if droidcsv != False:
+        if droidcsv is False:
             droidcsvhandler = droidCSVHandler()
             droidlist = droidcsvhandler.readDROIDCSV(droidcsv, self.BOM)
 
@@ -131,7 +124,7 @@ class DROIDLoader:
                     if key == "MIME_TYPE" or key == "METHOD":
                         if value == "":
                             value = "None"
-                    if self.basedb.hashtype == False:
+                    if self.basedb.hashtype is False:
                         if "_HASH" in key:
                             self.basedb.hashtype = key.split("_", 1)[0]
                         elif key == "HASH":
@@ -142,7 +135,7 @@ class DROIDLoader:
                             filekeystring + ToolMapping.DROID_FILE_MAP[key] + ", "
                         )
                         filevaluestring = filevaluestring + '"' + value + '", '
-                    if MULTIPLE == False:
+                    if MULTIPLE is False:
                         if key in ToolMapping.DROID_ID_MAP:
                             if key == "EXTENSION_MISMATCH":
                                 if value == "true":
@@ -154,7 +147,7 @@ class DROIDLoader:
                             )
                             idvaluestring = idvaluestring + '"' + value + '", '
                     else:
-                        if MULTIPLE_DONE == False:
+                        if MULTIPLE_DONE is False:
                             MULTIPLE_KEY_LIST, MULTIPLE_VALUE_LIST = self.populateIDTable(
                                 file[droidcsvhandler.DICT_FORMATS],
                                 METHOD,
@@ -173,7 +166,7 @@ class DROIDLoader:
                 fileidx = cursor.lastrowid
 
             if not folder:
-                if MULTIPLE != True:
+                if MULTIPLE is not True:
                     if idkeystring != "" and idvaluestring != "":
                         idkeystring = idkeystring + "NS_ID"
                         idvaluestring = idvaluestring + '"' + str(self.NS_ID) + '"'
@@ -182,7 +175,7 @@ class DROIDLoader:
                         )
                         id = cursor.lastrowid
 
-                    if id != None and file != None:
+                    if id is not None and file is not None:
                         cursor.execute(self.file_id_junction_insert(fileidx, id))
                 else:
                     for i, v in enumerate(MULTIPLE_KEY_LIST):
@@ -191,5 +184,5 @@ class DROIDLoader:
                         )
                         cursor.execute(insert)
                         id = cursor.lastrowid
-                        if fileidx != None:
+                        if fileidx is not None:
                             cursor.execute(self.file_id_junction_insert(fileidx, id))

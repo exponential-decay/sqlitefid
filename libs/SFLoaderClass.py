@@ -127,7 +127,7 @@ class SFLoader:
             newlist.append(sf.getDirName(d))
         newlist = set(newlist)  # make newlist unique
         dirset = list(dirset) + list(newlist)  # concatenate unique sets as lists
-        if count == False:
+        if count is False:
             return self.handledirectories(dirset, sf, len(dirset))
         else:
             if len(dirset) != count:
@@ -200,7 +200,7 @@ class SFLoader:
             for rowid in rowlist:
                 cursor.execute(self.file_id_junction_insert(fileid, rowid))
 
-            if sf.hashtype != False:
+            if sf.hashtype is not False:
                 self.basedb.hashtype = sf.hashtype
 
         # final act - add directories to file table--#

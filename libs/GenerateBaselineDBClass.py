@@ -222,6 +222,6 @@ class GenerateBaselineDB:
         self.execute_create(table)
 
     def execute_create(self, query):
-        if self.log != False:  # TODO: toggle output of create queries
+        if self.log is not False:  # TODO: toggle output of create queries
             sys.stderr.write("LOG: " + query + "\n")
         return self.cursor.execute(query)

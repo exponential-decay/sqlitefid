@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import sys
 import re
 
 
@@ -48,7 +47,7 @@ class IdentifyExport:
         + '"FORMAT_VERSION"'
     )
 
-    fido_re = "^(OK|KO),[0-9]+,(fmt|x-fmt)\/[0-9]{1,4},"
+    fido_re = r"^(OK|KO),[0-9]+,(fmt|x-fmt)\/[0-9]{1,4},"
 
     sf_orig = "---" + "\x0A" + "siegfried   :"
 

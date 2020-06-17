@@ -1,5 +1,6 @@
 ﻿# -*- coding: utf-8 -*-
 
+
 class ToolMapping:
 
     DROID_FILE_MAP = {
@@ -64,7 +65,7 @@ class ToolMapping:
         "extension mismatch": "EXTENSION_MISMATCH",
         "warning": "WARNING"
         # -----------------UNMAPPED FIELDS BETWEEN TRAD. DROID AND SIEGFRIED--------------------#
-        #'STATUS' : 'STATUS',                                                                  #
-        #'FORMAT_COUNT' : 'FORMAT_COUNT'  #mismatch extends into multiple namespace records    #
+        # 'STATUS' : 'STATUS',                                                                  #
+        # 'FORMAT_COUNT' : 'FORMAT_COUNT'  #mismatch extends into multiple namespace records    #
         # --------------------------------------------------------------------------------------#
     }

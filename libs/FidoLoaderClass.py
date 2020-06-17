@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
 import sys
-from ToolMappingClass import ToolMapping
-from CSVHandlerClass import *
 import tempfile
+
+from CSVHandlerClass import genericCSVHandler
 
 
 class FidoLoader:
@@ -32,8 +32,8 @@ class FidoLoader:
         sys.stdout.write(
             "Placeholder Code: Currently not handling FIDO exports." + "\n"
         )
-        if fidoexport != False:
+        if fidoexport is not False:
             tmpfile = self.createtmpfile(fidoexport)
             fidocsvhandler = genericCSVHandler()
-            fidolist = fidocsvhandler.csvaslist(tmpfile.name)
+            _ = fidocsvhandler.csvaslist(tmpfile.name)
             tmpfile.close()
