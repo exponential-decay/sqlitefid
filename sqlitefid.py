@@ -1,6 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
-from __future__ import division
+from __future__ import absolute_import, division
 import argparse
 import os
 import sys
@@ -26,16 +26,16 @@ def identifyinput(export):
    elif type == id.SFCSVTYPE:
       sys.stderr.write("Sigfried CSV. Not currently handled.")
    elif type == id.UNKTYPE:
-      sys.stderr.write("Unknown export type.")	
+      sys.stderr.write("Unknown export type.")
       return None
 
-def handleDROIDCSV(droidcsv, BOM=False): 
+def handleDROIDCSV(droidcsv, BOM=False):
    global basedb
    basedb = GenerateBaselineDB(droidcsv)
    loader = DROIDLoader(basedb, BOM)
    loader.droidDBSetup(droidcsv, basedb.getcursor())
    basedb.closedb()
-   return basedb.dbname   
+   return basedb.dbname
 
 def handleSFYAML(sfexport):
    global basedb
@@ -48,7 +48,7 @@ def handleSFYAML(sfexport):
 def handleFIDOCSV(fidoexport):
    #global basedb
    #basedb = GenerateBaselineDB(fidoexport)
-   basedb = None   
+   basedb = None
    loader = FidoLoader(basedb)
    loader.fidoDBSetup(fidoexport, None)
    #loader.fidoDBSetup(fidoexport, basedb.getcursor())
@@ -57,7 +57,7 @@ def handleFIDOCSV(fidoexport):
 
 def outputtime(start_time):
    sys.stderr.write("\n" + "--- %s seconds ---" % (time.time() - start_time) + "\n")
-   
+
 def main():
 
    #	Usage: 	--csv [droid report]
@@ -67,7 +67,7 @@ def main():
    parser.add_argument('--version', help='Optional: Output version number.', action="store_true")
 
    start_time = time.time()
-   
+
    if len(sys.argv)==1:
       parser.print_help()
       sys.exit(1)
@@ -75,7 +75,7 @@ def main():
    #	Parse arguments into namespace object to reference later in the script
    global args
    args = parser.parse_args()
-   
+
    if args.version:
       v = SqliteFIDVersion()
       sys.stdout.write(v.getVersion() + "\n")
