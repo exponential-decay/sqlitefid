@@ -84,7 +84,7 @@ class DROIDLoader:
     def droidDBSetup(self, droidcsv, cursor):
         self.NS_ID = self.setupNamespaceConstants(cursor, droidcsv)
 
-        if droidcsv is False:
+        if droidcsv is not False:
             droidcsvhandler = droidCSVHandler()
             droidlist = droidcsvhandler.readDROIDCSV(droidcsv, self.BOM)
 
