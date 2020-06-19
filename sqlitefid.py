@@ -26,7 +26,7 @@ def identifyinput(export):
     elif type == id.FIDOTYPE:
         return handleFIDOCSV(export)
     elif type == id.SFCSVTYPE:
-        sys.stderr.write("Sigfried CSV. Not currently handled.")
+        sys.stderr.write("Siegfried CSV. Not currently handled.")
     elif type == id.UNKTYPE:
         sys.stderr.write("Unknown export type.")
         return None
