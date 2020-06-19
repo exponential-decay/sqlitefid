@@ -1,9 +1,15 @@
 # -*- coding: utf-8 -*-
 
-import sys
+# Python 2 and 3.
+try:
+    from urllib.parse import urlparse
+except ImportError:
+    from urlparse import urlparse
+
 import os.path
+import sys
+
 import unicodecsv
-from urlparse import urlparse
 from PyDateHandler import PyDateHandler
 
 
@@ -29,7 +35,7 @@ class genericCSVHandler:
         csvlist = None
         if os.path.isfile(csvfname):
             csvlist = []
-            with open(csvfname, "rb") as csvfile:
+            with open(csvfname, "r") as csvfile:
                 if self.BOM is True:
                     csvfile.seek(len(self.BOMVAL))
                 csvreader = unicodecsv.reader(csvfile)
@@ -58,7 +64,7 @@ class genericCSVHandler:
         csvlist = None
         if os.path.isfile(csvfname):
             csvlist = []
-            with open(csvfname, "rb") as csvfile:
+            with open(csvfname, "r") as csvfile:
 
                 if self.BOM is True:
                     csvfile.seek(len(self.BOMVAL))
@@ -141,9 +147,9 @@ class genericCSVHandler:
     def checkline(self, line, lineno):
         if "\x00" in line:
             sys.stderr.write(
-                "CSV line "
-                + str(lineno + 1)
-                + " contains null byte '\\x00'. Replacing with an empty string.\n"
+                "CSV line {} contains null byte '\\x00'. Replacing with an empty string.\n".format(
+                    str(lineno + 1)
+                )
             )
             line = line.replace("\x00", "")
         return line

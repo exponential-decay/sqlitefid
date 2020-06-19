@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from .ToolMappingClass import ToolMapping
-from .CSVHandlerClass import droidCSVHandler
+from __future__ import absolute_import
+
+from CSVHandlerClass import droidCSVHandler
+from ToolMappingClass import ToolMapping
 
 
 class DROIDLoader:
@@ -84,7 +86,7 @@ class DROIDLoader:
     def droidDBSetup(self, droidcsv, cursor):
         self.NS_ID = self.setupNamespaceConstants(cursor, droidcsv)
 
-        if droidcsv is False:
+        if droidcsv is not False:
             droidcsvhandler = droidCSVHandler()
             droidlist = droidcsvhandler.readDROIDCSV(droidcsv, self.BOM)
 

@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 
 import sys
-from ToolMappingClass import ToolMapping
+
 from SFHandlerClass import SFYAMLHandler
+from ToolMappingClass import ToolMapping
 
 
 class SFLoader:
@@ -168,7 +169,10 @@ class SFLoader:
                 if key in ToolMapping.SF_FILE_MAP:
                     filekeystring = filekeystring + ToolMapping.SF_FILE_MAP[key] + ", "
                     if type(value) is not int:
-                        tmp = value.encode("utf-8")
+                        if not isinstance(value, str):
+                            tmp = value.encode("utf-8")
+                        else:
+                            tmp = value
                     else:
                         tmp = value
                     filevaluestring = filevaluestring + "'" + str(tmp) + "', "
