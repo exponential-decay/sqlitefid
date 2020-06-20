@@ -19,39 +19,21 @@ class IdentifyExport:
     SFTYPE = "siegfried"
     SFCSVTYPE = "siegfried csv"
 
-    droid_md5 = (
-        '"ID","PARENT_ID","URI","FILE_PATH","NAME","METHOD","STATUS"'
-        + ',"SIZE","TYPE","EXT","LAST_MODIFIED","EXTENSION_MISMATCH",'
-        + '"MD5_HASH","FORMAT_COUNT","PUID","MIME_TYPE","FORMAT_NAME",'
-        + '"FORMAT_VERSION"'
+    droid_header = "{}{}{}{}".format(
+        '"ID","PARENT_ID","URI","FILE_PATH","NAME","METHOD","STATUS"',
+        ',"SIZE","TYPE","EXT","LAST_MODIFIED","EXTENSION_MISMATCH",',
+        '"{}","FORMAT_COUNT","PUID","MIME_TYPE","FORMAT_NAME",',
+        '"FORMAT_VERSION"',
     )
 
-    droid_sha1 = (
-        '"ID","PARENT_ID","URI","FILE_PATH","NAME","METHOD","STATUS"'
-        + ',"SIZE","TYPE","EXT","LAST_MODIFIED","EXTENSION_MISMATCH",'
-        + '"SHA1_HASH","FORMAT_COUNT","PUID","MIME_TYPE","FORMAT_NAME",'
-        + '"FORMAT_VERSION"'
-    )
-
-    droid_sha256 = (
-        '"ID","PARENT_ID","URI","FILE_PATH","NAME","METHOD","STATUS"'
-        + ',"SIZE","TYPE","EXT","LAST_MODIFIED","EXTENSION_MISMATCH",'
-        + '"SHA256_HASH","FORMAT_COUNT","PUID","MIME_TYPE","FORMAT_NAME",'
-        + '"FORMAT_VERSION"'
-    )
-
-    droid_nohash = (
-        '"ID","PARENT_ID","URI","FILE_PATH","NAME","METHOD","STATUS"'
-        + ',"SIZE","TYPE","EXT","LAST_MODIFIED","EXTENSION_MISMATCH",'
-        + '"HASH","FORMAT_COUNT","PUID","MIME_TYPE","FORMAT_NAME",'
-        + '"FORMAT_VERSION"'
-    )
+    droid_md5 = droid_header.format("MD5_HASH")
+    droid_sha1 = droid_header.format("SHA1_HASH")
+    droid_sha256 = droid_header.format("SHA256_HASH")
+    droid_nohash = droid_header.format("HASH")
 
     fido_re = r"^(OK|KO),[0-9]+,(fmt|x-fmt)\/[0-9]{1,4},"
-
-    sf_orig = "---" + "\x0A" + "siegfried   :"
-
-    sfcsv_re = "^filename,filesize,modified,errors,md5,namespace,id,format,version,mime,basis,warning$"
+    sf_orig = r"---" + "\x0A" + "siegfried   :"
+    sfcsv_re = r"^filename,filesize,modified,errors,md5,namespace,id,format,version,mime,basis,warning$"
 
     # UTF8 with BOM
     droid_utf8 = "\xEF\xBB\xBF"
@@ -61,12 +43,9 @@ class IdentifyExport:
     droid_utf8_nohash = droid_utf8 + droid_nohash
 
     def exportid(self, export):
-
-        f = open(export, "rb")
-        droid_magic = f.readline()
-        sf_magic = droid_magic + f.readline()
-        f.close()
-
+        with open(export, "r") as f:
+            droid_magic = f.readline()
+            sf_magic = droid_magic + f.readline()
         if (
             droid_magic.strip() == self.droid_md5
             or droid_magic.strip() == self.droid_sha1

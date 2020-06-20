@@ -3,7 +3,7 @@
 import sys
 import tempfile
 
-from CSVHandlerClass import genericCSVHandler
+from .CSVHandlerClass import genericCSVHandler
 
 
 class FidoLoader:
@@ -17,7 +17,7 @@ class FidoLoader:
     # need a temporary fild with fido headers
     def createtmpfile(self, fidoexport):
         tmpfile = tempfile.NamedTemporaryFile()
-        with open(fidoexport, "rb") as csvfile:
+        with open(fidoexport, "r") as csvfile:
             for i, row in enumerate(csvfile):
                 # add fido header
                 if i == 0:

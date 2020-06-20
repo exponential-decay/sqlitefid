@@ -1,12 +1,16 @@
 # -*- coding: utf-8 -*-
 
+# PY3 compatibility (PY3 first)
+try:
+    from urllib import request, parse
+except ImportError:
+    import urllib, urlparse
+
 # we don't import YAML handler for this
 # as no standard PYTHON handler library
 import os.path
-import urllib
 import codecs
-from urlparse import urlparse, urljoin
-from PyDateHandler import PyDateHandler
+from .PyDateHandler import PyDateHandler
 
 
 class SFYAMLHandler:
@@ -314,14 +318,14 @@ class SFYAMLHandler:
     def getYear(self, datestring):
         return self.pydate.getYear(datestring)
 
-    def getContainers(self, id, filedict):
+    def getContainers(self, id_, filedict):
         # only set as File if and only if it isn't a Container
         # container overrides all...
-        if id in self.containers.values():
+        if id_ in self.containers.values():
             filedict[self.FIELDTYPE] = self.TYPECONT
             # get container type: http://stackoverflow.com/a/13149770
-            filedict[self.FIELDCONTTYPE] = self.containers.keys()[
-                self.containers.values().index(id)
+            filedict[self.FIELDCONTTYPE] = list(self.containers.keys())[
+                list(self.containers.values()).index(id_)
             ]
         else:
             if self.FIELDTYPE in filedict:
@@ -332,11 +336,17 @@ class SFYAMLHandler:
 
     def addFileURI(self, fname):
         fname = fname.replace("\\", "/")
-        test = urllib.pathname2url(fname.encode("utf-8"))
-        fname = urljoin("file:", test)
-
-        # decode to match droid/sf output
-        fname = urllib.unquote(fname).decode("utf-8")
+        # PY3 compatibility.
+        try:
+            test = request.pathname2url(fname.encode("utf-8"))
+        except NameError:
+            test = urllib.pathname2url(fname.encode("utf-8"))
+        try:
+            fname = parse.urljoin("file:", test)
+            fname = parse.unquote(fname)
+        except NameError:
+            fname = urlparse.urljoin("file:", test)
+            fname = urllib.unquote(fname)
         return fname
 
     def addContainerURI(self, container, containedfile, fname):
@@ -348,7 +358,10 @@ class SFYAMLHandler:
         return fname
 
     def geturischeme(self, fname):
-        return urlparse(fname).scheme
+        try:
+            return parse.urlparse(fname).scheme
+        except NameError:
+            return urlparse.urlparse(fname).scheme
 
     def addExt(self, sfdata):
         for row in sfdata[self.DICTFILES]:

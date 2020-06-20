@@ -15,19 +15,19 @@ from libs.Version import SqliteFIDVersion
 
 
 def identifyinput(export):
-    id = IdentifyExport()
-    type = id.exportid(export)
-    if type == id.DROIDTYPE:
+    id_ = IdentifyExport()
+    type_ = id_.exportid(export)
+    if type_ == id_.DROIDTYPE:
         return handleDROIDCSV(export)
-    elif type == id.DROIDTYPEBOM:
+    elif type_ == id_.DROIDTYPEBOM:
         return handleDROIDCSV(export, True)
-    elif type == id.SFTYPE:
+    elif type_ == id_.SFTYPE:
         return handleSFYAML(export)
-    elif type == id.FIDOTYPE:
+    elif type_ == id_.FIDOTYPE:
         return handleFIDOCSV(export)
-    elif type == id.SFCSVTYPE:
+    elif type_ == id_.SFCSVTYPE:
         sys.stderr.write("Siegfried CSV. Not currently handled.")
-    elif type == id.UNKTYPE:
+    elif type_ == id_.UNKTYPE:
         sys.stderr.write("Unknown export type.")
         return None
 

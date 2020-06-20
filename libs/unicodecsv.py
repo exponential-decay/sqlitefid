@@ -1,7 +1,12 @@
 # -*- coding: utf-8 -*-
 
 import csv
-from itertools import izip
+
+try:
+    import itertools.izip as izip
+except ImportError:
+    pass
+
 
 # https://pypi.python.org/pypi/unicodecsv
 # http://semver.org/
@@ -115,20 +120,30 @@ class UnicodeReader(object):
         self.encoding = encoding
         self.encoding_errors = errors
 
+    def __next__(self):
+        return self.next()
+
     def next(self):
-        row = self.reader.next()
+        # PY3 compatibility.
+        try:
+            row = self.reader.next()
+        except AttributeError:
+            row = self.reader.__next__()
         encoding = self.encoding
         encoding_errors = self.encoding_errors
         float_ = float
-        unicode_ = unicode
-        return [
-            (
-                value
-                if isinstance(value, float_)
-                else unicode_(value, encoding, encoding_errors)
-            )
-            for value in row
-        ]
+        try:
+            unicode_ = unicode
+            return [
+                (
+                    value
+                    if isinstance(value, float_)
+                    else unicode_(value, encoding, encoding_errors)
+                )
+                for value in row
+            ]
+        except NameError:
+            return [(value if isinstance(value, float_) else value) for value in row]
 
     def __iter__(self):
         return self
