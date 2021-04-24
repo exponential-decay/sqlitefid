@@ -6,8 +6,9 @@ try:
 except ImportError:
     from urlparse import urlparse
 
-import sys
 import os.path
+import sys
+
 from . import unicodecsv
 from .PyDateHandler import PyDateHandler
 

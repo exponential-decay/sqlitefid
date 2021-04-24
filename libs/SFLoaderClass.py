@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 
 import sys
-from .ToolMappingClass import ToolMapping
+
 from .SFHandlerClass import SFYAMLHandler
+from .ToolMappingClass import ToolMapping
 
 
 class SFLoader:

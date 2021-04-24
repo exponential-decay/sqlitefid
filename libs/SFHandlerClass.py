@@ -2,14 +2,18 @@
 
 # PY3 compatibility (PY3 first)
 try:
-    from urllib import request, parse
+    from urllib import parse, request
 except ImportError:
-    import urllib, urlparse
+    import urllib
+
+    import urlparse
 
 # we don't import YAML handler for this
+import codecs
+
 # as no standard PYTHON handler library
 import os.path
-import codecs
+
 from .PyDateHandler import PyDateHandler
 
 

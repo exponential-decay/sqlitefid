@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
+import sqlite3
 import sys
 import time
-import sqlite3
 
 
 class GenerateBaselineDB:

@@ -2,15 +2,17 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import absolute_import, division
+
 import argparse
 import os
 import sys
 import time
-from libs.IdentifyExportClass import IdentifyExport
-from libs.GenerateBaselineDBClass import GenerateBaselineDB
+
 from libs.DROIDLoaderClass import DROIDLoader
-from libs.SFLoaderClass import SFLoader
 from libs.FidoLoaderClass import FidoLoader
+from libs.GenerateBaselineDBClass import GenerateBaselineDB
+from libs.IdentifyExportClass import IdentifyExport
+from libs.SFLoaderClass import SFLoader
 from libs.Version import SqliteFIDVersion
 
 
