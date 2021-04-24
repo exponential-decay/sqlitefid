@@ -1,19 +1,19 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-from __future__ import absolute_import, division
+from __future__ import absolute_import
 
 import argparse
 import os
 import sys
 import time
 
-from libs.DROIDLoaderClass import DROIDLoader
-from libs.FidoLoaderClass import FidoLoader
-from libs.GenerateBaselineDBClass import GenerateBaselineDB
-from libs.IdentifyExportClass import IdentifyExport
-from libs.SFLoaderClass import SFLoader
-from libs.Version import SqliteFIDVersion
+from DROIDLoaderClass import DROIDLoader
+from FidoLoaderClass import FidoLoader
+from GenerateBaselineDBClass import GenerateBaselineDB
+from IdentifyExportClass import IdentifyExport
+from SFLoaderClass import SFLoader
+from Version import SqliteFIDVersion
 
 
 def identifyinput(export):

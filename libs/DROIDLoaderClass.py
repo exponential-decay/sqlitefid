@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from .CSVHandlerClass import droidCSVHandler
-from .ToolMappingClass import ToolMapping
+from __future__ import absolute_import
+
+from CSVHandlerClass import droidCSVHandler
+from ToolMappingClass import ToolMapping
 
 
 class DROIDLoader:

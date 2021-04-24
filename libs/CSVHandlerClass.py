@@ -9,8 +9,8 @@ except ImportError:
 import os.path
 import sys
 
-from . import unicodecsv
-from .PyDateHandler import PyDateHandler
+import unicodecsv
+from PyDateHandler import PyDateHandler
 
 
 class genericCSVHandler:

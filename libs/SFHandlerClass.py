@@ -14,7 +14,7 @@ import codecs
 # as no standard PYTHON handler library
 import os.path
 
-from .PyDateHandler import PyDateHandler
+from PyDateHandler import PyDateHandler
 
 
 class SFYAMLHandler:
