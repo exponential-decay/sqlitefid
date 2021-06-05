@@ -1,73 +1,98 @@
-#!/usr/bin/python3
 # -*- coding: utf-8 -*-
+
+# Disable pylint warnings for CSVHandlerClass imports which are not
+# straightforward as we try and handle PY2 and PY3.
+#
+# pylint: disable=E0611,E0401
+
+"""sqlitefid is the primary entry point for the sqlitefid application.
+The application takes a format identification report, e.g. DROID or
+Siegfried and maps it to a sqlite database for higher performance
+analysis of format identification results.
+"""
 
 from __future__ import absolute_import
 
 import argparse
+import logging
 import os
 import sys
 import time
 
-from DROIDLoaderClass import DROIDLoader
-from FidoLoaderClass import FidoLoader
-from GenerateBaselineDBClass import GenerateBaselineDB
-from IdentifyExportClass import IdentifyExport
-from SFLoaderClass import SFLoader
-from Version import SqliteFIDVersion
+LOGFORMAT = "%(asctime)-15s %(levelname)s: %(message)s"
+DATEFORMAT = "%Y-%m-%d %H:%M:%S"
+
+logging.basicConfig(format=LOGFORMAT, datefmt=DATEFORMAT, level="INFO")
+
+if __name__ == "__main__":
+    from libs.DROIDLoaderClass import DROIDLoader
+    from libs.FidoLoaderClass import FidoLoader
+    from libs.GenerateBaselineDBClass import GenerateBaselineDB
+    from libs.IdentifyExportClass import IdentifyExport
+    from libs.SFLoaderClass import SFLoader
+    from libs.Version import SqliteFIDVersion
+else:
+    from sqlitefid.libs.DROIDLoaderClass import DROIDLoader
+    from sqlitefid.libs.FidoLoaderClass import FidoLoader
+    from sqlitefid.libs.GenerateBaselineDBClass import GenerateBaselineDB
+    from sqlitefid.libs.IdentifyExportClass import IdentifyExport
+    from sqlitefid.libs.SFLoaderClass import SFLoader
+    from sqlitefid.libs.Version import SqliteFIDVersion
+
+args = None
 
 
 def identifyinput(export):
     id_ = IdentifyExport()
     type_ = id_.exportid(export)
     if type_ == id_.DROIDTYPE:
-        return handleDROIDCSV(export)
-    elif type_ == id_.DROIDTYPEBOM:
-        return handleDROIDCSV(export, True)
-    elif type_ == id_.SFTYPE:
-        return handleSFYAML(export)
-    elif type_ == id_.FIDOTYPE:
-        return handleFIDOCSV(export)
-    elif type_ == id_.SFCSVTYPE:
-        sys.stderr.write("Siegfried CSV. Not currently handled.")
-    elif type_ == id_.UNKTYPE:
-        sys.stderr.write("Unknown export type.")
-        return None
+        handleDROIDCSV(export)
+        return
+    if type_ == id_.DROIDTYPEBOM:
+        handleDROIDCSV(export, True)
+        return
+    if type_ == id_.SFTYPE:
+        handleSFYAML(export)
+        return
+    if type_ == id_.FIDOTYPE:
+        handleFIDOCSV(export)
+        return
+    if type_ == id_.SFCSVTYPE:
+        logging.info("Siegfried CSV. Not currently handled")
+        return
+    if type_ == id_.UNKTYPE:
+        logging.info("Unknown export type")
+        return
 
 
 def handleDROIDCSV(droidcsv, BOM=False):
-    global basedb
-    basedb = GenerateBaselineDB(droidcsv)
-    loader = DROIDLoader(basedb, BOM)
-    loader.droidDBSetup(droidcsv, basedb.getcursor())
+    basedb = GenerateBaselineDB(droidcsv, args.debug)
+    loader = DROIDLoader(basedb, BOM, debug=args.debug)
+    loader.create_droid_database(droidcsv, basedb.getcursor())
     basedb.closedb()
     return basedb.dbname
 
 
 def handleSFYAML(sfexport):
-    global basedb
-    basedb = GenerateBaselineDB(sfexport)
+    basedb = GenerateBaselineDB(sfexport, args.debug)
     loader = SFLoader(basedb)
-    loader.sfDBSetup(sfexport, basedb.getcursor())
+    loader.create_sf_database(sfexport, basedb.getcursor())
     basedb.closedb()
     return basedb.dbname
 
 
 def handleFIDOCSV(fidoexport):
-    # global basedb
-    # basedb = GenerateBaselineDB(fidoexport)
     basedb = None
     loader = FidoLoader(basedb)
-    loader.fidoDBSetup(fidoexport, None)
-    # loader.fidoDBSetup(fidoexport, basedb.getcursor())
-    # basedb.closedb()
-    # return basedb.dbname
+    loader.fido_db_setup(fidoexport, None)
 
 
 def outputtime(start_time):
-    sys.stderr.write("\n" + "--- %s seconds ---" % (time.time() - start_time) + "\n")
+    logging.info("Process took: %s seconds", (time.time() - start_time))
 
 
 def main():
+    """Primary entry point for sqlitefid."""
 
     # 	Usage: 	--csv [droid report]
     # 	Handle command line arguments for the script
@@ -76,6 +101,9 @@ def main():
     )
     parser.add_argument(
         "--export", "--droid", "--sf", help="Optional: Single tool export to read."
+    )
+    parser.add_argument(
+        "--debug", help="Optional: Log SQL queries", action="store_true"
     )
     parser.add_argument(
         "--version", help="Optional: Output version number.", action="store_true"
@@ -87,23 +115,23 @@ def main():
         parser.print_help()
         sys.exit(1)
 
-    # 	Parse arguments into namespace object to reference later in the script
     global args
     args = parser.parse_args()
 
     if args.version:
         v = SqliteFIDVersion()
-        sys.stdout.write(v.getVersion() + "\n")
+        print(v.getVersion())
         sys.exit(1)
 
-    if args.export:
-        if os.path.isfile(args.export):
-            identifyinput(args.export)
-            outputtime(start_time)
-        else:
-            sys.exit("Exiting: Not a file.")
-    else:
+    if not args.export:
+        sys.exit(0)
+
+    if not os.path.isfile(args.export):
+        logging.error("Not a file: %s", args.export)
         sys.exit(1)
+
+    identifyinput(args.export)
+    outputtime(start_time)
 
 
 if __name__ == "__main__":

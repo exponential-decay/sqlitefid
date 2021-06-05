@@ -1,19 +1,40 @@
 # -*- coding: utf-8 -*-
 
+# Disable pylint warnings for CSVHandlerClass imports which are not
+# straightforward as we try and handle PY2 and PY3.
+#
+# pylint: disable=E0611,E0401
+
+"""CSVHandlerClass
+
+Handles the CSV inputs for demystify.
+"""
+
+from __future__ import absolute_import
+
 # Python 2 and 3.
 try:
     from urllib.parse import urlparse
 except ImportError:
     from urlparse import urlparse
 
+import logging
 import os.path
-import sys
 
-import unicodecsv
-from PyDateHandler import PyDateHandler
+if __name__.startswith("sqlitefid"):
+    from sqlitefid.libs import unicodecsv
+    from sqlitefid.libs.PyDateHandler import PyDateHandler
+else:
+    from libs import unicodecsv
+    from libs.PyDateHandler import PyDateHandler
 
 
-class genericCSVHandler:
+class CSVExportException(Exception):
+    """Exception when a CSV file cannot be parsed."""
+
+
+class GenericCSVHandler:
+    """GenericCSVHandler."""
 
     BOM = False
     BOMVAL = "\xEF\xBB\xBF"
@@ -22,39 +43,63 @@ class genericCSVHandler:
     def __init__(self, BOM=False):
         self.BOM = BOM
 
-    def __getCSVheaders__(self, csvcolumnheaders):
+    @staticmethod
+    def __getCSVheaders__(header_row):
+        """Retrieve CSV headers from first row."""
         header_list = []
-        for header in csvcolumnheaders:
+        for header in header_row:
             header_list.append(header)
         return header_list
 
-    # returns list of rows, each row is a dictionary
-    # header: value, pair.
-    def csvaslist(self, csvfname):
+    def _csv_to_list(self, csvfile):
+        """ConvertCSV to list.
+
+        :param csv_file_stream: ...
+
+        :returns: ...
+        """
         columncount = 0
-        csvlist = None
-        if os.path.isfile(csvfname):
-            csvlist = []
-            with open(csvfname, "r") as csvfile:
-                if self.BOM is True:
-                    csvfile.seek(len(self.BOMVAL))
-                csvreader = unicodecsv.reader(csvfile)
-                for row in csvreader:
-                    if csvreader.line_num == 1:  # not zero-based index
-                        header_list = self.__getCSVheaders__(row)
-                        columncount = len(header_list)
-                    else:
-                        csv_dict = {}
-                        # for each column in header
-                        # note: don't need ID data. Ignoring multiple ID.
-                        for i in range(columncount):
-                            csv_dict[header_list[i]] = row[i]
-                        csvlist.append(csv_dict)
+        csvlist = []
+        if self.BOM is not True:
+            logging.info(csvlist)
+            return csvlist
+        csvfile.seek(0)
+        csvreader = unicodecsv.reader(csvfile)
+        for row in csvreader:
+            if csvreader.line_num == 1:  # not zero-based index
+                header_list = self.__getCSVheaders__(row)
+                columncount = len(header_list)
+            else:
+                csv_dict = {}
+                # for each column in header
+                # note: don't need ID data. Ignoring multiple ID.
+                for i in range(columncount):
+                    csv_dict[header_list[i]] = row[i]
+                csvlist.append(csv_dict)
+        logging.info(csvlist)
         return csvlist
 
-    # bespoke function for DROID only - non-transferrable (probably)
-    def csvaslist_DROID(self, csvfname):
+    def csvaslist(self, csv_path):
+        """Returns a list of dictionaries having parsed the input CSV.
 
+        :param csv_path: Path to a CSV file to parse and convert to a
+            list.
+
+        :returns: parsed CSV list (list), CSVExportException if the CSV
+            cannot be read.
+        """
+        if not os.path.isfile(csv_path):
+            raise CSVExportException("CSV file '{}' does not exist".format(csv_path))
+        logging.info("Creating CSV as Python list from input: '%s'", csv_path)
+        with open(csv_path, "r") as csvfile:
+            return self._csv_to_list(csvfile)
+
+    def csvaslist_DROID(self, csv_file_name):
+        """Return CSV as a list from a DROID report.
+
+        :param csv_file_name: filename of the file to open (string)
+        :returns: list containing the CSV contents (list)
+        """
         MULTIPLE = False
         FORMAT_COUNT = 13  # index of FORMAT_COUNT
         multi_fields = ["ID", "MIME_TYPE", "FORMAT_NAME", "FORMAT_VERSION"]
@@ -62,9 +107,9 @@ class genericCSVHandler:
 
         columncount = 0
         csvlist = None
-        if os.path.isfile(csvfname):
+        if os.path.isfile(csv_file_name):
             csvlist = []
-            with open(csvfname, "r") as csvfile:
+            with open(csv_file_name, "r") as csvfile:
 
                 if self.BOM is True:
                     csvfile.seek(len(self.BOMVAL))
@@ -112,8 +157,8 @@ class genericCSVHandler:
                                     while count > 0:
                                         mfields = multi_fields
                                         mdict = {}
-                                        for i, t in enumerate(mfields):
-                                            mdict[t] = '"' + format_list[i] + '"'
+                                        for idx, t in enumerate(mfields):
+                                            mdict[t] = '"{}"'.format(format_list[idx])
                                         format_list = format_list[len(mfields) :]
                                         multilist.append(mdict)
                                         count -= 1
@@ -126,10 +171,8 @@ class genericCSVHandler:
                                 try:
                                     csv_dict[header_list[i]] = row[i]
                                 except IndexError:
-                                    sys.stderr.write(
-                                        "Row len too short. Cannot write row: "
-                                        + str(row)
-                                        + "\n"
+                                    logging.error(
+                                        "Row len too short. Cannot write row: %s", row
                                     )
                                     break
 
@@ -144,79 +187,107 @@ class genericCSVHandler:
 
         return csvlist
 
-    def checkline(self, line, lineno):
+    @staticmethod
+    def checkline(line, lineno):
         if "\x00" in line:
-            sys.stderr.write(
-                "CSV line {} contains null byte '\\x00'. Replacing with an empty string.\n".format(
-                    str(lineno + 1)
-                )
+            logging.error(
+                "CSV line %s contains null byte '\\x00'. Replacing with an empty string.\n",
+                (lineno + 1),
             )
             line = line.replace("\x00", "")
         return line
 
 
-class droidCSVHandler:
+class DroidCSVHandler:
+    """DroidCSVHandler."""
+
     def __init__(self):
         # date handler class
         self.pydate = PyDateHandler()
+        self.csv = None
+        self.DICT_FORMATS = None
 
-    # returns droidlist type
     def readDROIDCSV(self, droidcsvfname, BOM=False):
-        csvhandler = genericCSVHandler(BOM)
+        csvhandler = GenericCSVHandler(BOM)
         self.DICT_FORMATS = csvhandler.DICT_FORMATS
         self.csv = csvhandler.csvaslist_DROID(droidcsvfname)
         return self.csv
 
-    def getDirName(self, filepath):
+    @staticmethod
+    def getDirName(filepath):
         return os.path.dirname(filepath)
 
-    def adddirname(self, droidlist):
-        for row in droidlist:
-            row[u"DIR_NAME"] = self.getDirName(row["FILE_PATH"])
-        return droidlist
+    def adddirname(self, droid_list):
+        for row in droid_list:
+            row["DIR_NAME"] = self.getDirName(row["FILE_PATH"])
+        return droid_list
 
-    def addurischeme(self, droidlist):
-        for row in droidlist:
-            row[u"URI_SCHEME"] = self.getURIScheme(row["URI"])
-        return droidlist
+    def addurischeme(self, droid_list):
+        for row in droid_list:
+            row["URI_SCHEME"] = self.get_uri_scheme(row["URI"])
+        return droid_list
 
     def getYear(self, datestring):
         return self.pydate.getYear(datestring)
 
-    def addYear(self, droidlist):
-        for row in droidlist:
+    def addYear(self, droid_list):
+        for row in droid_list:
             if row["LAST_MODIFIED"] == "":
-                row[u"YEAR"] = str(self.getYear(row["LAST_MODIFIED"])).decode("utf-8")
-        return droidlist
+                row["YEAR"] = self.getYear(row["LAST_MODIFIED"])
+        return droid_list
 
-    def removecontainercontents(self, droidlist):
-        newlist = []  # naive remove causes loop to skip items
-        for row in droidlist:
-            if self.getURIScheme(row["URI"]) == "file":
-                newlist.append(row)
-        return newlist
+    def removecontainercontents(self, droid_list):
+        new_list = []  # naive remove causes loop to skip items
+        for row in droid_list:
+            if self.get_uri_scheme(row["URI"]) == "file":
+                new_list.append(row)
+        return new_list
 
-    def removefolders(self, droidlist):
-        # TODO: We can generate counts here and store in member vars
-        newlist = []  # naive remove causes loop to skip items
-        for i, row in enumerate(droidlist):
+    @staticmethod
+    def removefolders(droid_list):
+        """Remove folders from existing DROID list.
+
+        :param droid_list: DROID export as CSV (list)
+        :returns: list containing entries that aren't folders (list)
+        """
+        new_list = []  # naive remove causes loop to skip items
+        for row in droid_list:
             if row["TYPE"] != "Folder":
-                newlist.append(row)
-        return newlist
+                new_list.append(row)
+        return new_list
 
-    def retrievefolderlist(self, droidlist):
-        newlist = []
-        for row in droidlist:
+    @staticmethod
+    def retrievefolderlist(droid_list):
+        """Return a list of folder file paths from a DROID list.
+
+        :param droidlist: DROID export as CSV (list)
+        :returns: list containing folder file paths (list)
+        """
+        new_list = []
+        for row in droid_list:
             if row["TYPE"] == "Folder":
-                newlist.append(row["FILE_PATH"])
-        return newlist
+                new_list.append(row["FILE_PATH"])
+        return new_list
 
-    def retrievefoldernames(self, droidlist):
-        newlist = []
-        for row in droidlist:
+    @staticmethod
+    def retrievefoldernames(droid_list):
+        """Return a list of folder names from a DROID list.
+
+        :param droidlist: DROID export as CSV (list)
+        :returns: list containing folder names from DROID export (list)
+        """
+        new_list = []
+        for row in droid_list:
             if row["TYPE"] == "Folder":
-                newlist.append(row["NAME"])
-        return newlist
+                new_list.append(row["NAME"])
+        return new_list
 
-    def getURIScheme(self, url):
+    @staticmethod
+    def get_uri_scheme(url):
+        """Return URI scheme from given URL.
+
+        :param url: URL to return scheme for, e.g. HTTP:// FTP://
+            (string)
+        :returns: URL scheme (string)
+        """
         return urlparse(url).scheme

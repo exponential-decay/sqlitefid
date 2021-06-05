@@ -1,12 +1,28 @@
 # -*- coding: utf-8 -*-
 
-import sys
+# Disable pylint warnings for CSVHandlerClass imports which are not
+# straightforward as we try and handle PY2 and PY3.
+#
+# pylint: disable=E0611,E0401
 
-from SFHandlerClass import SFYAMLHandler
-from ToolMappingClass import ToolMapping
+"""SFLoaderClass is responsible for placing much of the Siegfried data
+into the sqlite db.
+"""
+
+from __future__ import absolute_import
+
+import logging
+
+if __name__.startswith("sqlitefid"):
+    from sqlitefid.libs.SFHandlerClass import SFYAMLHandler
+    from sqlitefid.libs.ToolMappingClass import ToolMapping
+else:
+    from libs.SFHandlerClass import SFYAMLHandler
+    from libs.ToolMappingClass import ToolMapping
 
 
 class SFLoader:
+    """SFLoader."""
 
     basedb = ""
     identifiers = ""
@@ -15,58 +31,40 @@ class SFLoader:
         self.basedb = basedb
 
     def insertfiledbstring(self, keys, values):
-        insert = "INSERT INTO " + self.basedb.FILEDATATABLE
-        return (
-            insert + "(" + keys.strip(", ") + ") VALUES (" + values.strip(", ") + ");"
+        ins = "INSERT INTO {} ({}) VALUES ({});".format(
+            self.basedb.FILEDATATABLE, keys.strip(", "), values.strip(", ")
         )
+        return ins
 
     def insertiddbstring(self, keys, values):
-        insert = "INSERT INTO " + self.basedb.IDTABLE
-        return (
-            insert + "(" + keys.strip(", ") + ") VALUES (" + values.strip(", ") + ");"
+        ins = "INSERT INTO {} ({}) VALUES ({});".format(
+            self.basedb.IDTABLE, keys.strip(", "), values.strip(", ")
         )
+        return ins
 
-    def file_id_junction_insert(self, file, id):
-        return (
-            "INSERT INTO "
-            + self.basedb.ID_JUNCTION
-            + "("
-            + self.basedb.FILEID
-            + ","
-            + self.basedb.IDID
-            + ") VALUES ("
-            + str(file)
-            + ","
-            + str(id)
-            + ");"
+    def file_id_junction_insert(self, file, id_):
+        ins = "INSERT INTO {} ({}, {}) VALUES ({}, {});".format(
+            self.basedb.ID_JUNCTION, self.basedb.FILEID, self.basedb.IDID, file, id_
         )
+        return ins
 
     def addDirsToDB(self, dirs, cursor):
-        for d in dirs:
-            if "/" not in d:
-                name = d.rsplit("\\", 1)
+        """Insert a directory entry from the Siegfried report into the
+        database.
+        """
+        for dir_ in dirs:
+            if "/" not in dir_:
+                name = dir_.rsplit("\\", 1)
             else:
-                name = d.rsplit("/", 1)
-            if len(name) == 2:
+                name = dir_.rsplit("/", 1)
+            try:
                 name = name[1]
-            else:
-                name = d
-            insert = (
-                "INSERT INTO "
-                + self.basedb.FILEDATATABLE
-                + " ("
-                + "FILE_PATH, DIR_NAME, NAME,SIZE, TYPE"
-                + ")"
-                + "VALUES ('"
-                + d
-                + "','"
-                + d
-                + "','"
-                + name
-                + "',0,'Folder'"
-                + ");"
+            except IndexError:
+                name = dir_
+            ins = "INSERT INTO {} (FILE_PATH, DIR_NAME, NAME,SIZE, TYPE) VALUES ('{}', '{}', '{}', 0, 'Folder');".format(
+                self.basedb.FILEDATATABLE, dir_, dir_, name
             )
-            cursor.execute(insert)
+            cursor.execute(ins)
 
     def handleID(self, idsection, idkeystring, idvaluestring, nsdict):
         idk = []
@@ -75,13 +73,15 @@ class SFLoader:
             for key, value in idsection[x].items():
                 if key in ToolMapping.SF_ID_MAP:
                     idkeystring = idkeystring + ToolMapping.SF_ID_MAP[key] + ", "
-                    idvaluestring = idvaluestring + "'" + str(value) + "', "
+                    idvaluestring = "{}'{}', ".format(idvaluestring, value)
                 # unmapped: Basis and Warning
             if x in nsdict:
                 idkeystring = idkeystring + self.basedb.NSID
-                idvaluestring = idvaluestring + str(nsdict[x])
+                idvaluestring = "{}{}".format(idvaluestring, nsdict[x])
             else:
-                sys.stderr.write("LOG: Issue with namespace dictionary table.")
+                logging.error(
+                    "Issue with namespace dictionary table, can't find: %s", x
+                )
             idk.append(idkeystring.strip(", "))
             idv.append(idvaluestring.strip(", "))
             idkeystring = ""
@@ -98,50 +98,34 @@ class SFLoader:
         detailstext = sf.HEADDETAILS
         for h in range(count):
             no = h + 1
-            ns = nstext + str(no)
-            details = detailstext + str(no)
-
-            # NSID is integer primary key == rowid()
-            insert = (
-                "INSERT INTO "
-                + self.basedb.NAMESPACETABLE
-                + "("
-                + "NS_NAME"
-                + ", "
-                + "NS_DETAILS"
-                + ") VALUES ('"
-                + str(header[ns])
-                + "', '"
-                + str(header[details])
-                + "');"
+            ns = "{}{}".format(nstext, no)
+            details = "{}{}".format(detailstext, no)
+            ins = "INSERT INTO {} (NS_NAME, NS_DETAILS) VALUES ('{}', '{}');".format(
+                self.basedb.NAMESPACETABLE, header[ns], header[details]
             )
-
-            cursor.execute(insert)
+            cursor.execute(ins)
             nsdict[str(header[ns])] = cursor.lastrowid
         return nsdict
 
-    # find all unique directory values in listing...
     def handledirectories(self, dirs, sf, count=False):
         newlist = []
         dirset = set(dirs)
         for d in dirset:
             newlist.append(sf.getDirName(d))
-        newlist = set(newlist)  # make newlist unique
-        dirset = list(dirset) + list(newlist)  # concatenate unique sets as lists
+        newlist = set(newlist)
+        dirset = list(dirset) + list(newlist)
         if count is False:
             return self.handledirectories(dirset, sf, len(dirset))
-        else:
-            if len(dirset) != count:
-                return self.handledirectories(dirset, sf, len(dirset))
-            else:
-                return dirset
+        if len(dirset) != count:
+            return self.handledirectories(dirset, sf, len(dirset))
+        return dirset
 
-    def sfDBSetup(self, sfexport, cursor):
+    def create_sf_database(self, sfexport, cursor):
         sf = SFYAMLHandler()
         sf.readSFYAML(sfexport)
 
         headers = sf.getHeaders()
-        self.basedb.tooltype = "siegfried: " + str(headers["siegfried"])
+        self.basedb.tooltype = "siegfried: {}".format(headers["siegfried"])
 
         sfdata = sf.sfdata
 
@@ -168,14 +152,14 @@ class SFLoader:
             for key, value in f.items():
                 if key in ToolMapping.SF_FILE_MAP:
                     filekeystring = filekeystring + ToolMapping.SF_FILE_MAP[key] + ", "
-                    if type(value) is not int:
+                    if not isinstance(value, int):
                         if not isinstance(value, str):
                             tmp = value.encode("utf-8")
                         else:
                             tmp = value
                     else:
                         tmp = value
-                    filevaluestring = filevaluestring + "'" + str(tmp) + "', "
+                    filevaluestring = "{}'{}', ".format(filevaluestring, tmp)
                 if key == sf.FIELDDIRNAME:
                     dirlist.append(value)
                 else:
@@ -191,9 +175,9 @@ class SFLoader:
                 fileid = cursor.lastrowid
 
             insert = []
-            for x in range(len(idkey)):
+            for idx, value in enumerate(idkey):
                 insert.append(
-                    self.insertiddbstring("".join(idkey[x]), "".join(idvalue[x]))
+                    self.insertiddbstring("".join(value), "".join(idvalue[idx]))
                 )
 
             rowlist = []
@@ -207,8 +191,6 @@ class SFLoader:
             if sf.hashtype is not False:
                 self.basedb.hashtype = sf.hashtype
 
-        # final act - add directories to file table--#
-        # ---does not work well for absolute paths---#
-        # uniquedirs = self.handledirectories(dirlist, sf)
+        # Finally, add directories to the file table.
         uniquedirs = set(dirlist)
         self.addDirsToDB(uniquedirs, cursor)

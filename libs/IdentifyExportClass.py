@@ -1,11 +1,23 @@
 # -*- coding: utf-8 -*-
 
+"""IdentifyExportClass is responsible for identifying the type of export
+provided to sqlitefid. It largely does this using magic numbers.
+"""
+
+from __future__ import absolute_import
+
+import logging
 import re
 
 
 class IdentifyExport:
+    """IdentifyExport."""
 
     DROIDTYPE = "droid"  # backward compatibility for now...
+    SFTYPE = "siegfried"
+    SFCSVTYPE = "siegfried csv"
+    FIDOTYPE = "fido"
+    UNKTYPE = "unknown"
 
     # specific hashes
     DROIDMD5TYPE = "droid_md5"
@@ -13,11 +25,6 @@ class IdentifyExport:
     DROIDSHA256TYPE = "droid_md5"
     DROIDNOHASH = "droid_nohash"
     DROIDTYPEBOM = "droid_BOM"
-    FIDOTYPE = "fido"
-    UNKTYPE = "unknown"
-
-    SFTYPE = "siegfried"
-    SFCSVTYPE = "siegfried csv"
 
     droid_header = "{}{}{}{}".format(
         '"ID","PARENT_ID","URI","FILE_PATH","NAME","METHOD","STATUS"',
@@ -33,7 +40,12 @@ class IdentifyExport:
 
     fido_re = r"^(OK|KO),[0-9]+,(fmt|x-fmt)\/[0-9]{1,4},"
     sf_orig = r"---" + "\x0A" + "siegfried   :"
-    sfcsv_re = r"^filename,filesize,modified,errors,md5,namespace,id,format,version,mime,basis,warning$"
+    sfcsv_re = r"^filename,filesize,modified,errors,namespace,id,format,version,mime,basis,warning"
+    sfcsv_re_md5 = r"^filename,filesize,modified,errors,md5,namespace,id,format,version,mime,basis,warning"
+    sfcsv_re_sha1 = r"^filename,filesize,modified,errors,sha1,namespace,id,format,version,mime,basis,warning"
+    sfcsv_re_sha256 = r"^filename,filesize,modified,errors,sha256,namespace,id,format,version,mime,basis,warning"
+    sfcsv_re_sha512 = r"^filename,filesize,modified,errors,sha512,namespace,id,format,version,mime,basis,warning"
+    sfcsv_re_crc = r"^filename,filesize,modified,errors,crc,namespace,id,format,version,mime,basis,warning"
 
     # UTF8 with BOM
     droid_utf8 = "\xEF\xBB\xBF"
@@ -42,10 +54,26 @@ class IdentifyExport:
     droid_utf8_sha256 = droid_utf8 + droid_sha256
     droid_utf8_nohash = droid_utf8 + droid_nohash
 
+    droid_utf16 = "\xC3\xAF\xC2\xBB\xC2\xBF"
+    droid_utf16_md5 = droid_utf16 + droid_md5
+    droid_utf16_sha1 = droid_utf16 + droid_sha1
+    droid_utf16_sha256 = droid_utf16 + droid_sha256
+    droid_utf16_nohash = droid_utf16 + droid_nohash
+
     def exportid(self, export):
-        with open(export, "r") as f:
-            droid_magic = f.readline()
-            sf_magic = droid_magic + f.readline()
+        """Opens an identification report export and attempts to
+        identify the creating tool based on identifying characteristics.
+        """
+        sf_magic = ""
+        droid_magic = ""
+
+        try:
+            with open(export, "r") as f:
+                droid_magic = f.readline()
+                sf_magic = droid_magic + f.readline()
+        except IOError as err:
+            logging.error("Cannot identify export: %s", err)
+
         if (
             droid_magic.strip() == self.droid_md5
             or droid_magic.strip() == self.droid_sha1
@@ -53,18 +81,36 @@ class IdentifyExport:
             or droid_magic.strip() == self.droid_nohash
         ):
             return self.DROIDTYPE
-        elif (
+
+        if (
             droid_magic.strip() == self.droid_utf8_md5
             or droid_magic.strip() == self.droid_utf8_sha1
             or droid_magic.strip() == self.droid_utf8_sha256
             or droid_magic.strip() == self.droid_utf8_nohash
         ):
             return self.DROIDTYPEBOM
-        elif self.sf_orig in sf_magic.strip():
+
+        if (
+            droid_magic.strip() == self.droid_utf16_md5
+            or droid_magic.strip() == self.droid_utf16_sha1
+            or droid_magic.strip() == self.droid_utf16_sha256
+            or droid_magic.strip() == self.droid_utf16_nohash
+        ):
+            return self.DROIDTYPEBOM
+
+        if self.sf_orig in sf_magic.strip():
             return self.SFTYPE
-        elif re.search(re.compile(self.fido_re), droid_magic) is not None:
-            return self.FIDOTYPE
-        elif re.search(re.compile(self.sfcsv_re), droid_magic) is not None:
+        if (
+            re.search(re.compile(self.sfcsv_re), droid_magic) is not None
+            or re.search(re.compile(self.sfcsv_re_md5), droid_magic) is not None
+            or re.search(re.compile(self.sfcsv_re_sha1), droid_magic) is not None
+            or re.search(re.compile(self.sfcsv_re_sha256), droid_magic) is not None
+            or re.search(re.compile(self.sfcsv_re_sha512), droid_magic) is not None
+            or re.search(re.compile(self.sfcsv_re_crc), droid_magic) is not None
+        ):
             return self.SFCSVTYPE
-        else:
-            return self.UNKTYPE
+
+        if re.search(re.compile(self.fido_re), droid_magic) is not None:
+            return self.FIDOTYPE
+
+        return self.UNKTYPE

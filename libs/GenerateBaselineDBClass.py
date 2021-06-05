@@ -1,13 +1,18 @@
 # -*- coding: utf-8 -*-
 
+"""GenerateBaselineDBClass is responsible for setting up the baseline
+sqlite DB we will analyze all identification results with.
+"""
+
+from __future__ import absolute_import
+
+import logging
 import sqlite3
-import sys
 import time
 
 
 class GenerateBaselineDB:
-
-    log = False
+    """GenerateBaselineDB."""
 
     IDTABLE = "IDDATA"
     METADATATABLE = "DBMD"
@@ -66,7 +71,8 @@ class GenerateBaselineDB:
     hashtype = False
     tooltype = False
 
-    def __init__(self, export):
+    def __init__(self, export, debug=False):
+        self.log = debug
         self.dbname = self.getDBFilename(export)
         self.dbsetup()
 
@@ -81,6 +87,7 @@ class GenerateBaselineDB:
         self.createidtable()
         self.createjunctiontable(self.ID_JUNCTION, self.FILEID, self.IDID)
         self.createNStable()
+        self.create_indices()
         return self.cursor
 
     def getcursor(self):
@@ -88,12 +95,7 @@ class GenerateBaselineDB:
 
     def closedb(self):
         # write MD
-        self.createDBMD(self.cursor)
-
-        # Save (commit) the changes
-        self.conn.execute("CREATE INDEX HASH ON " + self.FILEDATATABLE + "(HASH)")
-        self.conn.execute("CREATE INDEX NAME ON " + self.FILEDATATABLE + "(NAME)")
-        self.conn.execute("CREATE INDEX PUID ON " + self.IDTABLE + "(ID)")
+        self.createDBMD()
 
         # Save (commit) the changes
         self.conn.commit()
@@ -102,13 +104,15 @@ class GenerateBaselineDB:
         # TO be sure any changes have been committed or they will be lost.
         self.conn.close()
 
-    def getDBFilename(self, export):
-        return export.split(".", 1)[0] + ".db"
+    @staticmethod
+    def getDBFilename(export):
+        return "{}{}".format(export.split(".", 1)[0], ".db")
 
-    def sethashtype(self, hash):
-        self.hashtype = hash
+    def sethashtype(self, hash_):
+        self.hashtype = hash_
 
-    def gettimestamp(self):
+    @staticmethod
+    def gettimestamp():
         return time.strftime("%Y-%m-%dT%H:%M:%S")
 
     def droptables(self, cursor):
@@ -120,14 +124,14 @@ class GenerateBaselineDB:
 
     def dropTable(self, cursor, tablename):
         # check we have a table to drop
-        cursor.execute(
-            "SELECT name FROM sqlite_master WHERE type='table' AND name='"
-            + tablename
-            + "';"
+        self.execute_create(
+            "SELECT name FROM sqlite_master WHERE type='table' AND name='{}';".format(
+                tablename
+            )
         )
         # can't drop something that doesn't exist
         if cursor.fetchone() is not None:
-            cursor.execute("DROP table " + tablename + "")  # DROP just in case
+            self.execute_create("DROP table " + tablename + "")  # DROP just in case
 
     def dropDBMDTable(self, cursor):
         self.dropTable(cursor, self.METADATATABLE)
@@ -144,30 +148,22 @@ class GenerateBaselineDB:
     def dropNSTable(self, cursor):
         self.dropTable(cursor, self.NAMESPACETABLE)
 
-    # Database metadata table
-    def createDBMD(self, cursor):
-        cursor.execute(
-            "CREATE TABLE "
-            + self.METADATATABLE
-            + " (TIMESTAMP TIMESTAMP, HASH_TYPE, TOOL_TYPE)"
+    def createDBMD(self):
+        create = "CREATE TABLE {} (TIMESTAMP TIMESTAMP, HASH_TYPE, TOOL_TYPE)".format(
+            self.METADATATABLE
         )
-        cursor.execute(
-            "INSERT INTO "
-            + self.METADATATABLE
-            + " VALUES ('"
-            + str(self.timestamp)
-            + "', + '"
-            + str(self.hashtype)
-            + "','"
-            + str(self.tooltype)
-            + "')"
+        self.execute_create(create)
+        ins = 'INSERT INTO {} VALUES ("{}", "{}", "{}")'.format(
+            self.METADATATABLE, self.timestamp, self.hashtype, self.tooltype
         )
+        self.execute_create(ins)
 
-    def createfield(self, table, column, type=False):
-        if type is not False:
-            table = table + str(column) + " " + type + ", "
+    @staticmethod
+    def createfield(table, column, type_=False):
+        if type_ is not False:
+            table = "{}{} {}, ".format(table, column, type_)
         else:
-            table = table + str(column) + ", "
+            table = "{}{}, ".format(table, column)
         return table
 
     def createfiledatatable(self):
@@ -179,7 +175,7 @@ class GenerateBaselineDB:
                 table = self.createfield(table, column, "INTEGER")
             elif column == "FILE_ID":
                 table = self.createfield(table, column, "integer primary key")
-            elif column == "PARENT_ID" or column == "INPUT_ID" or column == "SIZE":
+            elif column in ("PARENT_ID", "INPUT_ID", "SIZE"):
                 table = self.createfield(table, column, "integer")
             else:
                 table = self.createfield(table, column)
@@ -215,13 +211,18 @@ class GenerateBaselineDB:
         table = "CREATE TABLE " + self.NAMESPACETABLE + " ("
         for column in self.NS_TABLE:
             if column == self.NSID:
-                table = table + column + " INTEGER PRIMARY KEY, "
+                table = "{}{} INTEGER PRIMARY KEY, ".format(table, column)
             else:
-                table = table + column + ", "
-        table = table.rstrip(", ") + ")"
+                table = "{}{}, ".format(table, column)
+        table = "{})".format(table.rstrip(", "))
         self.execute_create(table)
 
+    def create_indices(self):
+        self.execute_create("CREATE INDEX HASH ON {} (HASH)".format(self.FILEDATATABLE))
+        self.execute_create("CREATE INDEX NAME ON {} (NAME)".format(self.FILEDATATABLE))
+        self.execute_create("CREATE INDEX PUID ON {} (ID)".format(self.IDTABLE))
+
     def execute_create(self, query):
-        if self.log is not False:  # TODO: toggle output of create queries
-            sys.stderr.write("LOG: " + query + "\n")
+        if self.log is not False:
+            logging.info(query)
         return self.cursor.execute(query)
