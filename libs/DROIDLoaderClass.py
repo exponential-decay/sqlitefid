@@ -2,8 +2,8 @@
 
 from __future__ import absolute_import
 
-from CSVHandlerClass import droidCSVHandler
-from ToolMappingClass import ToolMapping
+from libs.CSVHandlerClass import droidCSVHandler
+from libs.ToolMappingClass import ToolMapping
 
 
 class DROIDLoader:

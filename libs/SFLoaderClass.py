@@ -2,8 +2,8 @@
 
 import sys
 
-from SFHandlerClass import SFYAMLHandler
-from ToolMappingClass import ToolMapping
+from libs.SFHandlerClass import SFYAMLHandler
+from libs.ToolMappingClass import ToolMapping
 
 
 class SFLoader:

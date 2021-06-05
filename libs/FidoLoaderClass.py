@@ -3,7 +3,7 @@
 import sys
 import tempfile
 
-from CSVHandlerClass import genericCSVHandler
+from libs.CSVHandlerClass import genericCSVHandler
 
 
 class FidoLoader:
