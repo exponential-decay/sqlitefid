@@ -9,8 +9,12 @@ except ImportError:
 import os.path
 import sys
 
-from libs import unicodecsv
-from libs.PyDateHandler import PyDateHandler
+if __name__.startswith("sqlitefid"):
+    from sqlitefid.libs import unicodecsv
+    from sqlitefid.libs.PyDateHandler import PyDateHandler
+else:
+    from libs import unicodecsv
+    from libs.PyDateHandler import PyDateHandler
 
 
 class genericCSVHandler:

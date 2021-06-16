@@ -14,7 +14,10 @@ import codecs
 # as no standard PYTHON handler library
 import os.path
 
-from libs.PyDateHandler import PyDateHandler
+if __name__.startswith("sqlitefid"):
+    from sqlitefid.libs.PyDateHandler import PyDateHandler
+else:
+    from libs.PyDateHandler import PyDateHandler
 
 
 class SFYAMLHandler:

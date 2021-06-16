@@ -8,12 +8,21 @@ import os
 import sys
 import time
 
-from libs.DROIDLoaderClass import DROIDLoader
-from libs.FidoLoaderClass import FidoLoader
-from libs.GenerateBaselineDBClass import GenerateBaselineDB
-from libs.IdentifyExportClass import IdentifyExport
-from libs.SFLoaderClass import SFLoader
-from libs.Version import SqliteFIDVersion
+
+if __name__ == "__main__":
+    from libs.DROIDLoaderClass import DROIDLoader
+    from libs.FidoLoaderClass import FidoLoader
+    from libs.GenerateBaselineDBClass import GenerateBaselineDB
+    from libs.IdentifyExportClass import IdentifyExport
+    from libs.SFLoaderClass import SFLoader
+    from libs.Version import SqliteFIDVersion
+else:
+    from sqlitefid.libs.DROIDLoaderClass import DROIDLoader
+    from sqlitefid.libs.FidoLoaderClass import FidoLoader
+    from sqlitefid.libs.GenerateBaselineDBClass import GenerateBaselineDB
+    from sqlitefid.libs.IdentifyExportClass import IdentifyExport
+    from sqlitefid.libs.SFLoaderClass import SFLoader
+    from sqlitefid.libs.Version import SqliteFIDVersion
 
 
 def identifyinput(export):

@@ -2,8 +2,15 @@
 
 from __future__ import absolute_import
 
-from libs.CSVHandlerClass import droidCSVHandler
-from libs.ToolMappingClass import ToolMapping
+
+import sys
+
+if __name__.startswith("sqlitefid"):
+    from sqlitefid.libs.CSVHandlerClass import droidCSVHandler
+    from sqlitefid.libs.ToolMappingClass import ToolMapping
+else:
+    from libs.CSVHandlerClass import droidCSVHandler
+    from libs.ToolMappingClass import ToolMapping
 
 
 class DROIDLoader:
@@ -150,15 +157,18 @@ class DROIDLoader:
                             idvaluestring = idvaluestring + '"' + value + '", '
                     else:
                         if MULTIPLE_DONE is False:
-                            MULTIPLE_KEY_LIST, MULTIPLE_VALUE_LIST = self.populateIDTable(
+                            (
+                                MULTIPLE_KEY_LIST,
+                                MULTIPLE_VALUE_LIST,
+                            ) = self.populateIDTable(
                                 file[droidcsvhandler.DICT_FORMATS],
                                 METHOD,
                                 STATUS,
                                 MISMATCH,
                             )
                             MULTIPLE_DONE = (
-                                True
-                            )  # don't loop around this more than is needed
+                                True  # don't loop around this more than is needed
+                            )
 
             id = None
             fileidx = None

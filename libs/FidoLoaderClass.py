@@ -3,7 +3,10 @@
 import sys
 import tempfile
 
-from libs.CSVHandlerClass import genericCSVHandler
+if __name__.startswith("sqlitefid"):
+    from sqlitefid.libs.CSVHandlerClass import genericCSVHandler
+else:
+    from libs.CSVHandlerClass import genericCSVHandler
 
 
 class FidoLoader:
