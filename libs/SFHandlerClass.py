@@ -88,11 +88,11 @@ class SFYAMLHandler:
     DICTFILES = "files"
     DICTID = "identification"
 
-    TYPECONT = "Container"
+    TYPE_CONTAINER = "Container"
     TYPEFILE = "File"
 
     # additional fields given to SF output
-    FIELDFILENAME = "filename"
+    FIELD_FILE_NAME = "filename"
     FIELDURI = "uri"
     FIELDURISCHEME = "uri scheme"
     FIELDDIRNAME = "directory"
@@ -154,7 +154,29 @@ class SFYAMLHandler:
             elif line[0] != "identifiers":
                 self.header[line[0]] = line[1]
 
+    def add_file_uri(self, filedict):
+        """Add file URIs to filedict structure.
+
+        :param filedict: filedict structure containing information
+            about our file.
+        :returns: None (nonetype)
+        """
+        fname = filedict[self.FIELD_FILE_NAME]
+        file_uri = self.addFileURI(fname)
+        if filedict[self.FIELDTYPE] == "Container":
+            file_uri = self.addContainerURI(filedict, filedict, file_uri)
+        filedict[self.FIELDURI] = file_uri
+        filedict[self.FIELDURISCHEME] = self.geturischeme(file_uri)
+
     def filesection(self, sfrecord):
+        """Returns some information about the SF report.
+
+        :param sfrecord: A list of non-parsed records from Siegfried
+            to be converted. (list[(string)])
+        :returns: A file dictionary to be appended to the global file
+            list. (dict)
+        """
+
         iddict = {}  # { nsname : {id : x, mime : x } }
         filedict = {}
 
@@ -165,18 +187,7 @@ class SFYAMLHandler:
             s = self.handleentry(s)
             if s[0] in self.fileheaders:
                 filedict[s[0]] = s[1]
-                if s[0] == self.FIELDFILENAME:
-                    fname = filedict[self.FIELDFILENAME]
-                    furi = self.addFileURI(fname)
-                    for f in self.files:
-                        needle_name = f[self.FIELDFILENAME]
-                        needle_type = f[self.FIELDTYPE]
-                        haystack = fname
-                        if needle_name in haystack:
-                            if needle_type == self.TYPECONT:
-                                furi = self.addContainerURI(f, filedict, furi)
-                    filedict[self.FIELDURI] = furi
-                    filedict[self.FIELDURISCHEME] = self.geturischeme(furi)
+
                 if s[0] in self.hashes and self.hashtype is None:
                     self.hashtype = s[0]
 
@@ -211,6 +222,10 @@ class SFYAMLHandler:
                             s[1] = "none"
                     iddata[s[0]] = s[1]
 
+        # TODO: Add tests to make sure the file URI is constructed
+        # correctly.
+        self.add_file_uri(filedict)
+
         if self.FIELDVERSION not in iddata:
             iddata[self.FIELDVERSION] = ""
 
@@ -219,6 +234,7 @@ class SFYAMLHandler:
 
         # add complete id data to filedata, return
         filedict[self.DICTID] = iddict
+
         return filedict
 
     def readSFYAML(self, sfname):
@@ -306,13 +322,13 @@ class SFYAMLHandler:
 
     def adddirname(self, sfdata):
         for row in sfdata[self.DICTFILES]:
-            fname = row[self.FIELDFILENAME]
+            fname = row[self.FIELD_FILE_NAME]
             row[self.FIELDDIRNAME] = self.getDirName(fname)
         return sfdata
 
     def addfilename(self, sfdata):
         for row in sfdata[self.DICTFILES]:
-            fname = row[self.FIELDFILENAME]
+            fname = row[self.FIELD_FILE_NAME]
             row["name"] = self.getFileName(fname)
         return sfdata
 
@@ -329,19 +345,25 @@ class SFYAMLHandler:
         # only set as File if and only if it isn't a Container
         # container overrides all...
         if id_ in self.containers.values():
-            filedict[self.FIELDTYPE] = self.TYPECONT
+            filedict[self.FIELDTYPE] = self.TYPE_CONTAINER
             # get container type: http://stackoverflow.com/a/13149770
             filedict[self.FIELDCONTTYPE] = list(self.containers.keys())[
                 list(self.containers.values()).index(id_)
             ]
         else:
             if self.FIELDTYPE in filedict:
-                if filedict[self.FIELDTYPE] != self.TYPECONT:
+                if filedict[self.FIELDTYPE] != self.TYPE_CONTAINER:
                     filedict[self.FIELDTYPE] = self.TYPEFILE
             else:
                 filedict[self.FIELDTYPE] = self.TYPEFILE
 
     def addFileURI(self, fname):
+        """Creates a file URI for a given path.
+
+        :param fname: ...
+        :returns: ...
+        """
+
         fname = fname.replace("\\", "/")
         # PY3 compatibility.
         try:
@@ -357,10 +379,18 @@ class SFYAMLHandler:
         return fname
 
     def addContainerURI(self, container, containedfile, fname):
+        """Creates a container URI for a given path.
+
+        :param container: ...
+        :param containedfile: ...
+        :param fname: ...
+        :returns: ...
+        """
+
         fname = fname
         fname = container[self.FIELDCONTTYPE] + ":" + fname
         fname = fname.replace(
-            container[self.FIELDFILENAME], container[self.FIELDFILENAME] + "!"
+            container[self.FIELD_FILE_NAME], container[self.FIELD_FILE_NAME] + "!"
         )
         return fname
 
