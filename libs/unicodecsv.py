@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import absolute_import
+
+import csv
+
 # TODO: noqa below is temporary. The unicode type is not supported in
 # Python 3 and so it is likely we'll hit this error at some point.
 #
 # flake8: noqa
 
-import csv
 
 try:
     import itertools.izip as izip

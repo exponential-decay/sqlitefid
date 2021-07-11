@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 
-import sys
+from __future__ import absolute_import
 
 import pytest
 
-from sqlitefid.libs import PyDateHandler
-from sqlitefid.libs import SFHandlerClass
+from sqlitefid.libs import PyDateHandler, SFHandlerClass
 
 
 @pytest.mark.parametrize(

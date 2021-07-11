@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import absolute_import
+
 # Python 2 and 3.
 try:
     from urllib.parse import urlparse

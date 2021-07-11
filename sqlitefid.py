@@ -8,7 +8,6 @@ import os
 import sys
 import time
 
-
 if __name__ == "__main__":
     from libs.DROIDLoaderClass import DROIDLoader
     from libs.FidoLoaderClass import FidoLoader

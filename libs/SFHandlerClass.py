@@ -1,5 +1,12 @@
 # -*- coding: utf-8 -*-
 
+# Disables deprecated urllib function warning where we use urllib in
+# addFileURI below.
+#
+# pylint: disable=W1658
+
+from __future__ import absolute_import
+
 # PY3 compatibility (PY3 first)
 try:
     from urllib import parse, request

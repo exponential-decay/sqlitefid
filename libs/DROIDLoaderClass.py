@@ -2,9 +2,6 @@
 
 from __future__ import absolute_import
 
-
-import sys
-
 if __name__.startswith("sqlitefid"):
     from sqlitefid.libs.CSVHandlerClass import droidCSVHandler
     from sqlitefid.libs.ToolMappingClass import ToolMapping
