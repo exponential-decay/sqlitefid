@@ -9,6 +9,12 @@ import csv
 #
 # flake8: noqa
 
+# TODO PY3: The majority of this piece is not expected to work in the
+# final PY3 version. Original code:
+#
+#   https://github.com/jdunck/python-unicodecsv
+#
+# pylint: skip-file
 
 try:
     import itertools.izip as izip
