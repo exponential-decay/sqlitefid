@@ -4,9 +4,15 @@
 from __future__ import absolute_import
 
 import argparse
+import logging
 import os
 import sys
 import time
+
+LOGFORMAT = "%(asctime)-15s %(levelname)s: %(message)s"
+DATEFORMAT = "%Y-%m-%d %H:%M:%S"
+
+logging.basicConfig(format=LOGFORMAT, datefmt=DATEFORMAT, level="INFO")
 
 if __name__ == "__main__":
     from libs.DROIDLoaderClass import DROIDLoader
@@ -61,18 +67,13 @@ def handleSFYAML(sfexport):
 
 
 def handleFIDOCSV(fidoexport):
-    # global basedb
-    # basedb = GenerateBaselineDB(fidoexport)
     basedb = None
     loader = FidoLoader(basedb)
-    loader.fidoDBSetup(fidoexport, None)
-    # loader.fidoDBSetup(fidoexport, basedb.getcursor())
-    # basedb.closedb()
-    # return basedb.dbname
+    loader.fido_db_setup(fidoexport, None)
 
 
 def outputtime(start_time):
-    sys.stderr.write("\n" + "--- %s seconds ---" % (time.time() - start_time) + "\n")
+    logging.info("--- %s seconds ---", (time.time() - start_time))
 
 
 def main():
