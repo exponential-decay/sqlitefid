@@ -1,5 +1,10 @@
 # -*- coding: utf-8 -*-
 
+"""CSVHandlerClass
+
+Handles the CSV inputs for demystify.
+"""
+
 from __future__ import absolute_import
 
 # Python 2 and 3.
@@ -8,6 +13,7 @@ try:
 except ImportError:
     from urlparse import urlparse
 
+import logging
 import os.path
 import sys
 
@@ -19,7 +25,12 @@ else:
     from libs.PyDateHandler import PyDateHandler
 
 
-class genericCSVHandler:
+class CSVExportException(Exception):
+    """Exception when a CSV file cannot be parsed."""
+
+
+class GenericCSVHandler:
+    """GenericCSVHandler."""
 
     BOM = False
     BOMVAL = "\xEF\xBB\xBF"
@@ -34,33 +45,55 @@ class genericCSVHandler:
             header_list.append(header)
         return header_list
 
-    # returns list of rows, each row is a dictionary
-    # header: value, pair.
-    def csvaslist(self, csvfname):
+    def _csv_to_list(self, csvfile):
+        """ConvertCSV to list.
+
+        :param csv_file_stream: ...
+
+        :returns: ...
+        """
         columncount = 0
-        csvlist = None
-        if os.path.isfile(csvfname):
-            csvlist = []
-            with open(csvfname, "r") as csvfile:
-                if self.BOM is True:
-                    csvfile.seek(len(self.BOMVAL))
-                csvreader = unicodecsv.reader(csvfile)
-                for row in csvreader:
-                    if csvreader.line_num == 1:  # not zero-based index
-                        header_list = self.__getCSVheaders__(row)
-                        columncount = len(header_list)
-                    else:
-                        csv_dict = {}
-                        # for each column in header
-                        # note: don't need ID data. Ignoring multiple ID.
-                        for i in range(columncount):
-                            csv_dict[header_list[i]] = row[i]
-                        csvlist.append(csv_dict)
+        csvlist = []
+        if self.BOM is not True:
+            logging.info(csvlist)
+            return csvlist
+        csvfile.seek(len(self.BOMVAL))
+        csvreader = unicodecsv.reader(csvfile)
+        for row in csvreader:
+            if csvreader.line_num == 1:  # not zero-based index
+                header_list = self.__getCSVheaders__(row)
+                columncount = len(header_list)
+            else:
+                csv_dict = {}
+                # for each column in header
+                # note: don't need ID data. Ignoring multiple ID.
+                for i in range(columncount):
+                    csv_dict[header_list[i]] = row[i]
+                csvlist.append(csv_dict)
+        logging.info(csvlist)
         return csvlist
 
-    # bespoke function for DROID only - non-transferrable (probably)
-    def csvaslist_DROID(self, csvfname):
+    def csvaslist(self, csv_path):
+        """Returns a list of dictionaries having parsed the input CSV.
 
+        :param csv_path: Path to a CSV file to parse and convert to a
+            list.
+
+        :returns: parsed CSV list (list), CSVExportException if the CSV
+            cannot be read.
+        """
+        if not os.path.isfile(csv_path):
+            raise CSVExportException("CSV file '{}' does not exist".format(csv_path))
+        logging.info("Creating CSV as Python list from input: '%s'", csv_path)
+        with open(csv_path, "r") as csvfile:
+            return self._csv_to_list(csvfile)
+
+    def csvaslist_DROID(self, csv_file_name):
+        """Return CSV as a list from a DROID report.
+
+        :param csv_file_name: filename of the file to open (string)
+        :returns: list containing the CSV contents (list)
+        """
         MULTIPLE = False
         FORMAT_COUNT = 13  # index of FORMAT_COUNT
         multi_fields = ["ID", "MIME_TYPE", "FORMAT_NAME", "FORMAT_VERSION"]
@@ -68,9 +101,9 @@ class genericCSVHandler:
 
         columncount = 0
         csvlist = None
-        if os.path.isfile(csvfname):
+        if os.path.isfile(csv_file_name):
             csvlist = []
-            with open(csvfname, "r") as csvfile:
+            with open(csv_file_name, "r") as csvfile:
 
                 if self.BOM is True:
                     csvfile.seek(len(self.BOMVAL))
@@ -168,7 +201,7 @@ class droidCSVHandler:
 
     # returns droidlist type
     def readDROIDCSV(self, droidcsvfname, BOM=False):
-        csvhandler = genericCSVHandler(BOM)
+        csvhandler = GenericCSVHandler(BOM)
         self.DICT_FORMATS = csvhandler.DICT_FORMATS
         self.csv = csvhandler.csvaslist_DROID(droidcsvfname)
         return self.csv
