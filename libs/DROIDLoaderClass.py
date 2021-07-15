@@ -3,10 +3,10 @@
 from __future__ import absolute_import
 
 if __name__.startswith("sqlitefid"):
-    from sqlitefid.libs.CSVHandlerClass import droidCSVHandler
+    from sqlitefid.libs.CSVHandlerClass import DroidCSVHandler
     from sqlitefid.libs.ToolMappingClass import ToolMapping
 else:
-    from libs.CSVHandlerClass import droidCSVHandler
+    from libs.CSVHandlerClass import DroidCSVHandler
     from libs.ToolMappingClass import ToolMapping
 
 
@@ -91,7 +91,7 @@ class DROIDLoader:
         self.NS_ID = self.setupNamespaceConstants(cursor, droidcsv)
 
         if droidcsv is not False:
-            droidcsvhandler = droidCSVHandler()
+            droidcsvhandler = DroidCSVHandler()
             droidlist = droidcsvhandler.readDROIDCSV(droidcsv, self.BOM)
 
         droidlist = droidcsvhandler.addurischeme(droidlist)

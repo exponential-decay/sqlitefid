@@ -1,5 +1,10 @@
 # -*- coding: utf-8 -*-
 
+# Disable pylint warnings for CSVHandlerClass imports which are not
+# straightforward as we try and handle PY2 and PY3.
+#
+# pylint: disable=E0611,E0401
+
 """CSVHandlerClass
 
 Handles the CSV inputs for demystify.
@@ -195,10 +200,12 @@ class GenericCSVHandler:
         return line
 
 
-class droidCSVHandler:
+class DroidCSVHandler:
     def __init__(self):
         # date handler class
         self.pydate = PyDateHandler()
+        self.csv = None
+        self.DICT_FORMATS = None
 
     # returns droidlist type
     def readDROIDCSV(self, droidcsvfname, BOM=False):
@@ -210,53 +217,74 @@ class droidCSVHandler:
     def getDirName(self, filepath):
         return os.path.dirname(filepath)
 
-    def adddirname(self, droidlist):
-        for row in droidlist:
+    def adddirname(self, droid_list):
+        for row in droid_list:
             row[u"DIR_NAME"] = self.getDirName(row["FILE_PATH"])
-        return droidlist
+        return droid_list
 
-    def addurischeme(self, droidlist):
-        for row in droidlist:
-            row[u"URI_SCHEME"] = self.getURIScheme(row["URI"])
-        return droidlist
+    def addurischeme(self, droid_list):
+        for row in droid_list:
+            row[u"URI_SCHEME"] = self.get_uri_scheme(row["URI"])
+        return droid_list
 
     def getYear(self, datestring):
         return self.pydate.getYear(datestring)
 
-    def addYear(self, droidlist):
-        for row in droidlist:
+    def addYear(self, droid_list):
+        for row in droid_list:
             if row["LAST_MODIFIED"] == "":
                 row[u"YEAR"] = str(self.getYear(row["LAST_MODIFIED"])).decode("utf-8")
-        return droidlist
+        return droid_list
 
-    def removecontainercontents(self, droidlist):
-        newlist = []  # naive remove causes loop to skip items
-        for row in droidlist:
-            if self.getURIScheme(row["URI"]) == "file":
-                newlist.append(row)
-        return newlist
+    def removecontainercontents(self, droid_list):
+        new_list = []  # naive remove causes loop to skip items
+        for row in droid_list:
+            if self.get_uri_scheme(row["URI"]) == "file":
+                new_list.append(row)
+        return new_list
 
-    def removefolders(self, droidlist):
-        # TODO: We can generate counts here and store in member vars
-        newlist = []  # naive remove causes loop to skip items
-        for i, row in enumerate(droidlist):
+    def removefolders(self, droid_list):
+        """Remove folders from existing DROID list.
+
+        :param droid_list: DROID export as CSV (list)
+        :returns: list containing entries that aren't folders (list)
+        """
+        new_list = []  # naive remove causes loop to skip items
+        for row in droid_list:
             if row["TYPE"] != "Folder":
-                newlist.append(row)
-        return newlist
+                new_list.append(row)
+        return new_list
 
-    def retrievefolderlist(self, droidlist):
-        newlist = []
-        for row in droidlist:
+    def retrievefolderlist(self, droid_list):
+        """Return a list of folder file paths from a DROID list.
+
+        :param droidlist: DROID export as CSV (list)
+        :returns: list containing folder file paths (list)
+        """
+        new_list = []
+        for row in droid_list:
             if row["TYPE"] == "Folder":
-                newlist.append(row["FILE_PATH"])
-        return newlist
+                new_list.append(row["FILE_PATH"])
+        return new_list
 
-    def retrievefoldernames(self, droidlist):
-        newlist = []
-        for row in droidlist:
+    def retrievefoldernames(self, droid_list):
+        """Return a list of folder names from a DROID list.
+
+        :param droidlist: DROID export as CSV (list)
+        :returns: list containing folder names from DROID export (list)
+        """
+        new_list = []
+        for row in droid_list:
             if row["TYPE"] == "Folder":
-                newlist.append(row["NAME"])
-        return newlist
+                new_list.append(row["NAME"])
+        return new_list
 
-    def getURIScheme(self, url):
+    @staticmethod
+    def get_uri_scheme(url):
+        """Return URI scheme from given URL.
+
+        :param url: URL to return scheme for, e.g. HTTP:// FTP://
+            (string)
+        :returns: URL scheme (string)
+        """
         return urlparse(url).scheme
