@@ -39,9 +39,10 @@ class GenericCSVHandler:
     def __init__(self, BOM=False):
         self.BOM = BOM
 
-    def __getCSVheaders__(self, csvcolumnheaders):
+    def __getCSVheaders__(self, header_row):
+        """Retrieve CSV headers from first row."""
         header_list = []
-        for header in csvcolumnheaders:
+        for header in header_row:
             header_list.append(header)
         return header_list
 
@@ -57,7 +58,7 @@ class GenericCSVHandler:
         if self.BOM is not True:
             logging.info(csvlist)
             return csvlist
-        csvfile.seek(len(self.BOMVAL))
+        csvfile.seek(0)
         csvreader = unicodecsv.reader(csvfile)
         for row in csvreader:
             if csvreader.line_num == 1:  # not zero-based index
