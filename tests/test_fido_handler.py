@@ -3,11 +3,12 @@
 from __future__ import absolute_import
 
 import io
+import sys
 
 from sqlitefid.libs.CSVHandlerClass import GenericCSVHandler
 
-FIDO_CSV = u""""info.status","info.time","info.puid","info.formatname","info.signaturename","info.filesize","info.filename","info.mimetype","info.matchtype"
-OK,203,fmt/729,"SQLite Database File Format","SQLite Database",249856,"data/opf-test-corpus-droid-analysis.db","application/x-sqlite3","signature"
+FIDO_CSV = """"info.status","info.time","info.puid","info.formatname","info.signaturename","info.filesize","info.filename","info.mimetype","info.matchtype"
+OK,203,fmt/729,"SQLite Database File Format","SQLite Database",249856,"data/🖤opf-test-corpus-droid-analysis.db","application/x-sqlite3","signature"
 OK,15,x-fmt/18,"Comma Separated Values","External",167823,"data/opf-test-corpus-droid-analysis.csv","text/csv","extension"
 OK,14,x-fmt/18,"Comma Separated Values","External",0,"data/fido.csv","text/csv","extension"
 OK,12,fmt/818,"YAML","External",35868,"data/sf.yaml","None","extension"
@@ -17,13 +18,24 @@ OK,14,fmt/938,"Python Script File","External",0,"__init__.py","None","extension"
 OK,14,fido-fmt/python,"Python script file","External",0,"__init__.py","None","extension"
 OK,9,fmt/939,"Python Compiled File","PYC 2.7",159,"__init__.pyc","None","signature"""
 
+if sys.version_info[0] == 3:
+    PY3 = True
+else:
+    PY3 = False
+
+
+def _StringIO():
+    if PY3 is True:
+        return io.StringIO()
+    return io.BytesIO()
+
 
 def test_fido_handler_no_BOM():
     """Ensure that the return for a non-identified CSV is accurate. This
     is determined in the constructor.
     """
     fidocsvhandler = GenericCSVHandler(BOM=False)
-    csv_in = io.StringIO()
+    csv_in = _StringIO()
     csv_in.write(FIDO_CSV)
     res = fidocsvhandler._csv_to_list(csv_in)
     assert res == []
@@ -33,7 +45,7 @@ def test_fido_handler_no_BOM():
 def test_fido_handler_BOM():
     """Ensure that we get sensible values out of a valid CSV."""
     fidocsvhandler = GenericCSVHandler(BOM=True)
-    csv_in = io.StringIO()
+    csv_in = _StringIO()
     csv_in.write(FIDO_CSV)
     res = fidocsvhandler._csv_to_list(csv_in)
     assert len(res) == 9
@@ -66,7 +78,7 @@ def test_fido_handler_BOM():
     assert res[0][FILE_SIZE] == "249856"
     assert res[8][FILE_SIZE] == "159"
 
-    assert res[0][FILE_NAME] == "data/opf-test-corpus-droid-analysis.db"
+    assert res[0][FILE_NAME] == u"data/🖤opf-test-corpus-droid-analysis.db"
     assert res[8][FILE_NAME] == "__init__.pyc"
 
     assert res[0][MIME] == "application/x-sqlite3"
