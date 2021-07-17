@@ -205,7 +205,6 @@ class DroidCSVHandler:
         self.csv = None
         self.DICT_FORMATS = None
 
-    # returns droidlist type
     def readDROIDCSV(self, droidcsvfname, BOM=False):
         csvhandler = GenericCSVHandler(BOM)
         self.DICT_FORMATS = csvhandler.DICT_FORMATS

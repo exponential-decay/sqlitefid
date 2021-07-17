@@ -203,10 +203,10 @@ class GenerateBaselineDB:
         table = "CREATE TABLE " + self.NAMESPACETABLE + " ("
         for column in self.NS_TABLE:
             if column == self.NSID:
-                table = table + column + " INTEGER PRIMARY KEY, "
+                table = "{}{} INTEGER PRIMARY KEY, ".format(table, column)
             else:
-                table = table + column + ", "
-        table = table.rstrip(", ") + ")"
+                table = "{}{}, ".format(table, column)
+        table = "{})".format(table.rstrip(", "))
         self.execute_create(table)
 
     def create_indices(self):
