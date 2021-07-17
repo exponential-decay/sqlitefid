@@ -142,12 +142,12 @@ class SFLoader:
             else:
                 return dirset
 
-    def sfDBSetup(self, sfexport, cursor):
+    def create_sf_database(self, sfexport, cursor):
         sf = SFYAMLHandler()
         sf.readSFYAML(sfexport)
 
         headers = sf.getHeaders()
-        self.basedb.tooltype = "siegfried: " + str(headers["siegfried"])
+        self.basedb.tooltype = "siegfried: {}".format(headers["siegfried"])
 
         sfdata = sf.sfdata
 

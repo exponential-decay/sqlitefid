@@ -61,7 +61,7 @@ def handleSFYAML(sfexport):
     global basedb
     basedb = GenerateBaselineDB(sfexport, args.debug)
     loader = SFLoader(basedb)
-    loader.sfDBSetup(sfexport, basedb.getcursor())
+    loader.create_sf_database(sfexport, basedb.getcursor())
     basedb.closedb()
     return basedb.dbname
 
