@@ -50,7 +50,7 @@ def identifyinput(export):
 
 def handleDROIDCSV(droidcsv, BOM=False):
     global basedb
-    basedb = GenerateBaselineDB(droidcsv)
+    basedb = GenerateBaselineDB(droidcsv, args.debug)
     loader = DROIDLoader(basedb, BOM)
     loader.droidDBSetup(droidcsv, basedb.getcursor())
     basedb.closedb()
@@ -59,7 +59,7 @@ def handleDROIDCSV(droidcsv, BOM=False):
 
 def handleSFYAML(sfexport):
     global basedb
-    basedb = GenerateBaselineDB(sfexport)
+    basedb = GenerateBaselineDB(sfexport, args.debug)
     loader = SFLoader(basedb)
     loader.sfDBSetup(sfexport, basedb.getcursor())
     basedb.closedb()
@@ -87,6 +87,9 @@ def main():
         "--export", "--droid", "--sf", help="Optional: Single tool export to read."
     )
     parser.add_argument(
+        "--debug", help="Optional: Log SQL queries", action="store_true"
+    )
+    parser.add_argument(
         "--version", help="Optional: Output version number.", action="store_true"
     )
 
@@ -96,23 +99,23 @@ def main():
         parser.print_help()
         sys.exit(1)
 
-    # 	Parse arguments into namespace object to reference later in the script
     global args
     args = parser.parse_args()
 
     if args.version:
         v = SqliteFIDVersion()
-        sys.stdout.write(v.getVersion() + "\n")
+        print(v.getVersion())
         sys.exit(1)
 
-    if args.export:
-        if os.path.isfile(args.export):
-            identifyinput(args.export)
-            outputtime(start_time)
-        else:
-            sys.exit("Exiting: Not a file.")
-    else:
+    if not args.export:
+        sys.exit(0)
+
+    if not os.path.isfile(args.export):
+        logging.error("Exiting: Not a file.")
         sys.exit(1)
+
+    identifyinput(args.export)
+    outputtime(start_time)
 
 
 if __name__ == "__main__":

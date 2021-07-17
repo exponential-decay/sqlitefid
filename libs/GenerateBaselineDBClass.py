@@ -2,14 +2,12 @@
 
 from __future__ import absolute_import
 
+import logging
 import sqlite3
-import sys
 import time
 
 
 class GenerateBaselineDB:
-
-    log = False
 
     IDTABLE = "IDDATA"
     METADATATABLE = "DBMD"
@@ -68,7 +66,8 @@ class GenerateBaselineDB:
     hashtype = False
     tooltype = False
 
-    def __init__(self, export):
+    def __init__(self, export, debug=False):
+        self.log = debug
         self.dbname = self.getDBFilename(export)
         self.dbsetup()
 
@@ -83,6 +82,7 @@ class GenerateBaselineDB:
         self.createidtable()
         self.createjunctiontable(self.ID_JUNCTION, self.FILEID, self.IDID)
         self.createNStable()
+        self.create_indices()
         return self.cursor
 
     def getcursor(self):
@@ -91,11 +91,6 @@ class GenerateBaselineDB:
     def closedb(self):
         # write MD
         self.createDBMD(self.cursor)
-
-        # Save (commit) the changes
-        self.conn.execute("CREATE INDEX HASH ON " + self.FILEDATATABLE + "(HASH)")
-        self.conn.execute("CREATE INDEX NAME ON " + self.FILEDATATABLE + "(NAME)")
-        self.conn.execute("CREATE INDEX PUID ON " + self.IDTABLE + "(ID)")
 
         # Save (commit) the changes
         self.conn.commit()
@@ -122,14 +117,14 @@ class GenerateBaselineDB:
 
     def dropTable(self, cursor, tablename):
         # check we have a table to drop
-        cursor.execute(
+        self.execute_create(
             "SELECT name FROM sqlite_master WHERE type='table' AND name='"
             + tablename
             + "';"
         )
         # can't drop something that doesn't exist
         if cursor.fetchone() is not None:
-            cursor.execute("DROP table " + tablename + "")  # DROP just in case
+            self.execute_create("DROP table " + tablename + "")  # DROP just in case
 
     def dropDBMDTable(self, cursor):
         self.dropTable(cursor, self.METADATATABLE)
@@ -146,24 +141,15 @@ class GenerateBaselineDB:
     def dropNSTable(self, cursor):
         self.dropTable(cursor, self.NAMESPACETABLE)
 
-    # Database metadata table
     def createDBMD(self, cursor):
-        cursor.execute(
-            "CREATE TABLE "
-            + self.METADATATABLE
-            + " (TIMESTAMP TIMESTAMP, HASH_TYPE, TOOL_TYPE)"
+        create = "CREATE TABLE {} (TIMESTAMP TIMESTAMP, HASH_TYPE, TOOL_TYPE)".format(
+            self.METADATATABLE
         )
-        cursor.execute(
-            "INSERT INTO "
-            + self.METADATATABLE
-            + " VALUES ('"
-            + str(self.timestamp)
-            + "', + '"
-            + str(self.hashtype)
-            + "','"
-            + str(self.tooltype)
-            + "')"
+        self.execute_create(create)
+        ins = 'INSERT INTO {} VALUES ("{}", "{}", "{}")'.format(
+            self.METADATATABLE, self.timestamp, self.hashtype, self.tooltype
         )
+        self.execute_create(ins)
 
     def createfield(self, table, column, type=False):
         if type is not False:
@@ -223,7 +209,12 @@ class GenerateBaselineDB:
         table = table.rstrip(", ") + ")"
         self.execute_create(table)
 
+    def create_indices(self):
+        self.execute_create("CREATE INDEX HASH ON {} (HASH)".format(self.FILEDATATABLE))
+        self.execute_create("CREATE INDEX NAME ON {} (NAME)".format(self.FILEDATATABLE))
+        self.execute_create("CREATE INDEX PUID ON {} (ID)".format(self.IDTABLE))
+
     def execute_create(self, query):
         if self.log is not False:  # TODO: toggle output of create queries
-            sys.stderr.write("LOG: " + query + "\n")
+            logging.info(query)
         return self.cursor.execute(query)
