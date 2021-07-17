@@ -51,8 +51,8 @@ def identifyinput(export):
 def handleDROIDCSV(droidcsv, BOM=False):
     global basedb
     basedb = GenerateBaselineDB(droidcsv, args.debug)
-    loader = DROIDLoader(basedb, BOM)
-    loader.droidDBSetup(droidcsv, basedb.getcursor())
+    loader = DROIDLoader(basedb, BOM, debug=args.debug)
+    loader.create_droid_database(droidcsv, basedb.getcursor())
     basedb.closedb()
     return basedb.dbname
 
@@ -111,7 +111,7 @@ def main():
         sys.exit(0)
 
     if not os.path.isfile(args.export):
-        logging.error("Exiting: Not a file.")
+        logging.error("Not a file: {}".format(args.export))
         sys.exit(1)
 
     identifyinput(args.export)

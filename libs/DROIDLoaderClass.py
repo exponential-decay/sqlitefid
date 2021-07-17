@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import absolute_import
+from __future__ import absolute_import, print_function
 
 if __name__.startswith("sqlitefid"):
     from sqlitefid.libs.CSVHandlerClass import DroidCSVHandler
@@ -18,16 +18,17 @@ class DROIDLoader:
     NS_ID = 0
     NS_DETAILS = "droid"  # to be overwritten by filename
 
-    def __init__(self, basedb, BOM=False):
+    def __init__(self, basedb, BOM=False, debug=False):
+        self.debug = debug
         self.basedb = basedb
         self.BOM = BOM
         self.basedb.tooltype = "droid"
 
     def insertfiledbstring(self, keys, values):
-        insert = "INSERT INTO " + self.basedb.FILEDATATABLE
-        return (
-            insert + "(" + keys.strip(", ") + ") VALUES (" + values.strip(", ") + ");"
+        ins = u"INSERT INTO {} ({}) VALUES ({});".format(
+            self.basedb.FILEDATATABLE, keys.strip(", "), values.strip(", ")
         )
+        return ins
 
     def insertiddbstring(self, keys, values):
         insert = "INSERT INTO " + self.basedb.IDTABLE
@@ -79,7 +80,7 @@ class DROIDLoader:
         cursor.execute(ins)
         return cursor.lastrowid
 
-    def droidDBSetup(self, droidcsv, cursor):
+    def create_droid_database(self, droidcsv, cursor):
         """Reads a DROID CSV file and adds its data to an sqlite DB.
 
         :param droidcsv: path to DROID csv file (string)
@@ -91,10 +92,11 @@ class DROIDLoader:
 
         self.NS_ID = self.setupNamespaceConstants(cursor, droidcsv)
 
-        if droidcsv is not False:
-            droidcsvhandler = DroidCSVHandler()
-            droidlist = droidcsvhandler.readDROIDCSV(droidcsv, self.BOM)
+        if droidcsv is False:
+            return
 
+        droidcsvhandler = DroidCSVHandler()
+        droidlist = droidcsvhandler.readDROIDCSV(droidcsv, self.BOM)
         droidlist = droidcsvhandler.addurischeme(droidlist)
         droidlist = droidcsvhandler.addYear(droidlist)
         droidlist = droidcsvhandler.adddirname(droidlist)
@@ -110,7 +112,7 @@ class DROIDLoader:
             idkeystring = ""
             idvaluestring = ""
 
-            # FIELDS FOR MULTIPLE ID FIELDS
+            # Multiple identification fields.
             METHOD = file["METHOD"]
             if METHOD == "":
                 METHOD = "None"
@@ -122,51 +124,55 @@ class DROIDLoader:
                 MISMATCH = "False"
 
             MULTIPLE = False
-            if int(file["FORMAT_COUNT"]) > 1:
-                MULTIPLE = True
             MULTIPLE_DONE = False
+            try:
+                if int(file["FORMAT_COUNT"]) > 1:
+                    MULTIPLE = True
+            except ValueError:
+                # We anticipate an integer or empty cell here, e.g. for
+                # a directory entry.
+                pass
 
             for key, value in file.items():
-                if key != "FORMAT_COUNT":
-                    if key == "MIME_TYPE" or key == "METHOD":
-                        if value == "":
-                            value = "None"
-                    if self.basedb.hashtype is False:
-                        if "_HASH" in key:
-                            self.basedb.hashtype = key.split("_", 1)[0]
-                        elif key == "HASH":
-                            # no hash used in export
-                            self.basedb.hashtype = "None"
-                    if key in ToolMapping.DROID_FILE_MAP:
-                        filekeystring = (
-                            filekeystring + ToolMapping.DROID_FILE_MAP[key] + ", "
+
+                try:
+                    # Convert the value to Unicode to work with.
+                    value = u"{}".format(value)
+                except AttributeError:
+                    pass
+
+                if key == "FORMAT_COUNT":
+                    continue
+                if key == "MIME_TYPE" or key == "METHOD":
+                    if value == "":
+                        value = "None"
+                if self.basedb.hashtype is False:
+                    self.basedb.hashtype = "None"
+                    if "_HASH" in key:
+                        self.basedb.hashtype = key.split("_", 1)[0]
+                if key in ToolMapping.DROID_FILE_MAP:
+                    filekeystring = u"{}{}, ".format(
+                        filekeystring, ToolMapping.DROID_FILE_MAP[key]
+                    )
+                    filevaluestring = u'{}"{}", '.format(filevaluestring, value)
+                if MULTIPLE is False:
+                    if key in ToolMapping.DROID_ID_MAP:
+                        if key == "EXTENSION_MISMATCH":
+                            value = "False"
+                            if value == "true":
+                                value = "True"
+                        idkeystring = u"{}{}, ".format(
+                            idkeystring, ToolMapping.DROID_ID_MAP[key]
                         )
-                        filevaluestring = filevaluestring + '"' + value + '", '
-                    if MULTIPLE is False:
-                        if key in ToolMapping.DROID_ID_MAP:
-                            if key == "EXTENSION_MISMATCH":
-                                if value == "true":
-                                    value = "True"
-                                elif value == "false":
-                                    value = "False"
-                            idkeystring = (
-                                idkeystring + ToolMapping.DROID_ID_MAP[key] + ", "
-                            )
-                            idvaluestring = idvaluestring + '"' + value + '", '
-                    else:
-                        if MULTIPLE_DONE is False:
-                            (
-                                MULTIPLE_KEY_LIST,
-                                MULTIPLE_VALUE_LIST,
-                            ) = self.populateIDTable(
-                                file[droidcsvhandler.DICT_FORMATS],
-                                METHOD,
-                                STATUS,
-                                MISMATCH,
-                            )
-                            MULTIPLE_DONE = (
-                                True  # don't loop around this more than is needed
-                            )
+                        idvaluestring = u'{} "{}", '.format(idvaluestring, value)
+                else:
+                    if MULTIPLE_DONE is False:
+                        (MULTIPLE_KEY_LIST, MULTIPLE_VALUE_LIST) = self.populateIDTable(
+                            file[droidcsvhandler.DICT_FORMATS], METHOD, STATUS, MISMATCH
+                        )
+                        MULTIPLE_DONE = (
+                            True  # don't loop around this more than is needed
+                        )
 
             id = None
             fileidx = None

@@ -217,12 +217,12 @@ class DroidCSVHandler:
 
     def adddirname(self, droid_list):
         for row in droid_list:
-            row[u"DIR_NAME"] = self.getDirName(row["FILE_PATH"])
+            row["DIR_NAME"] = self.getDirName(row["FILE_PATH"])
         return droid_list
 
     def addurischeme(self, droid_list):
         for row in droid_list:
-            row[u"URI_SCHEME"] = self.get_uri_scheme(row["URI"])
+            row["URI_SCHEME"] = self.get_uri_scheme(row["URI"])
         return droid_list
 
     def getYear(self, datestring):
@@ -231,7 +231,7 @@ class DroidCSVHandler:
     def addYear(self, droid_list):
         for row in droid_list:
             if row["LAST_MODIFIED"] == "":
-                row[u"YEAR"] = str(self.getYear(row["LAST_MODIFIED"])).decode("utf-8")
+                row["YEAR"] = self.getYear(row["LAST_MODIFIED"])
         return droid_list
 
     def removecontainercontents(self, droid_list):
