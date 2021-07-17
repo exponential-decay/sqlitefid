@@ -36,6 +36,8 @@ class DROIDLoader:
         )
 
     def file_id_junction_insert(self, file, id):
+
+        # ins = "INSERT INTO {} ({}, {}) VALUES ({}, {});".format(self.basedb.ID_JUNCTION, self.basedb.FILEID, self.basedb.IDID, str(file), str(id))
         return (
             "INSERT INTO "
             + self.basedb.ID_JUNCTION
@@ -71,23 +73,22 @@ class DROIDLoader:
 
     def setupNamespaceConstants(self, cursor, filename):
         self.NS_DETAILS = filename
-        insert = (
-            "INSERT INTO "
-            + self.basedb.NAMESPACETABLE
-            + " ("
-            + "NS_NAME"
-            + ", "
-            + "NS_DETAILS"
-            + ") VALUES ('"
-            + self.NS_NAME
-            + "', '"
-            + self.NS_DETAILS
-            + "');"
+        ins = 'INSERT INTO {} (NS_NAME, NS_DETAILS) VALUES ("{}", "{}");'.format(
+            self.basedb.NAMESPACETABLE, self.NS_NAME, self.NS_DETAILS
         )
-        cursor.execute(insert)
+        cursor.execute(ins)
         return cursor.lastrowid
 
     def droidDBSetup(self, droidcsv, cursor):
+        """Reads a DROID CSV file and adds its data to an sqlite DB.
+
+        :param droidcsv: path to DROID csv file (string)
+        :param cursor: sqlite database cursor to work with
+            (sqlite3.Cursor)
+
+        :returns: None (Nonetype)
+        """
+
         self.NS_ID = self.setupNamespaceConstants(cursor, droidcsv)
 
         if droidcsv is not False:

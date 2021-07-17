@@ -158,7 +158,7 @@ class GenericCSVHandler:
                                         mfields = multi_fields
                                         mdict = {}
                                         for i, t in enumerate(mfields):
-                                            mdict[t] = '"' + format_list[i] + '"'
+                                            mdict[t] = '"{}"'.format(format_list[i])
                                         format_list = format_list[len(mfields) :]
                                         multilist.append(mdict)
                                         count -= 1
@@ -171,10 +171,8 @@ class GenericCSVHandler:
                                 try:
                                     csv_dict[header_list[i]] = row[i]
                                 except IndexError:
-                                    sys.stderr.write(
-                                        "Row len too short. Cannot write row: "
-                                        + str(row)
-                                        + "\n"
+                                    logging.error(
+                                        "Row len too short. Cannot write row: %s", row
                                     )
                                     break
 
