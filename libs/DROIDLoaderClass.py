@@ -155,6 +155,7 @@ class DROIDLoader:
                         filekeystring, ToolMapping.DROID_FILE_MAP[key]
                     )
                     filevaluestring = u'{}"{}", '.format(filevaluestring, value)
+
                 if MULTIPLE is False:
                     if key in ToolMapping.DROID_ID_MAP:
                         if key == "EXTENSION_MISMATCH":
@@ -170,35 +171,34 @@ class DROIDLoader:
                         (MULTIPLE_KEY_LIST, MULTIPLE_VALUE_LIST) = self.populateIDTable(
                             file[droidcsvhandler.DICT_FORMATS], METHOD, STATUS, MISMATCH
                         )
-                        MULTIPLE_DONE = (
-                            True  # don't loop around this more than is needed
-                        )
+                        MULTIPLE_DONE = True
 
-            id = None
+            id_ = None
             fileidx = None
 
             if filekeystring != "" and filevaluestring != "":
                 cursor.execute(self.insertfiledbstring(filekeystring, filevaluestring))
                 fileidx = cursor.lastrowid
 
-            if not folder:
-                if MULTIPLE is not True:
-                    if idkeystring != "" and idvaluestring != "":
-                        idkeystring = idkeystring + "NS_ID"
-                        idvaluestring = idvaluestring + '"' + str(self.NS_ID) + '"'
-                        cursor.execute(
-                            self.insertiddbstring(idkeystring, idvaluestring)
-                        )
-                        id = cursor.lastrowid
+            if folder:
+                continue
 
-                    if id is not None and file is not None:
-                        cursor.execute(self.file_id_junction_insert(fileidx, id))
-                else:
-                    for i, v in enumerate(MULTIPLE_KEY_LIST):
-                        insert = self.insertiddbstring(
-                            ", ".join(v), ", ".join(MULTIPLE_VALUE_LIST[i])
-                        )
-                        cursor.execute(insert)
-                        id = cursor.lastrowid
-                        if fileidx is not None:
-                            cursor.execute(self.file_id_junction_insert(fileidx, id))
+            if MULTIPLE:
+                for i, v in enumerate(MULTIPLE_KEY_LIST):
+                    insert = self.insertiddbstring(
+                        ", ".join(v), ", ".join(MULTIPLE_VALUE_LIST[i])
+                    )
+                    cursor.execute(insert)
+                    id_ = cursor.lastrowid
+                    if fileidx is not None:
+                        cursor.execute(self.file_id_junction_insert(fileidx, id_))
+                continue
+
+            if idkeystring != "" and idvaluestring != "":
+                idkeystring = idkeystring + "NS_ID"
+                idvaluestring = idvaluestring + '"' + str(self.NS_ID) + '"'
+                cursor.execute(self.insertiddbstring(idkeystring, idvaluestring))
+                id_ = cursor.lastrowid
+
+            if id_ is not None and file is not None:
+                cursor.execute(self.file_id_junction_insert(fileidx, id_))
