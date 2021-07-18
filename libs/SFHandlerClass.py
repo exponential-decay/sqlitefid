@@ -3,7 +3,14 @@
 # Disables deprecated urllib function warning where we use urllib in
 # addFileURI below.
 #
-# pylint: disable=W1658
+# Also disables import warnings as we try and import for PY2 and PY3
+# together.
+#
+# pylint: disable=W1658,E1101,E0611,E0401
+
+"""SFHandlerClass provides the functions needed to understand a
+Siegfried YAML file so that it can be parsed into an sqlite DB.
+"""
 
 from __future__ import absolute_import
 
@@ -15,10 +22,8 @@ except ImportError:
 
     import urlparse
 
-# we don't import YAML handler for this
 import codecs
-
-# as no standard PYTHON handler library
+import ntpath
 import os.path
 
 if __name__.startswith("sqlitefid"):
@@ -28,33 +33,17 @@ else:
 
 
 class SFYAMLHandler:
-    def __init__(self):
-        # date handler class
-        self.pydate = PyDateHandler()
-
-    sectioncount = 0
-    identifiercount = 0
+    """SFYAMLHandler."""
 
     YAMLSECTION = "---"
     YAMLNAMESPACE = "name"
     YAMLDETAILS = "details"
-
-    header = {}
 
     HEADDETAILS = "id details "
     HEADNAMESPACE = "id namespace "
     HEADCOUNT = "identifier count"
 
     FILERECORDLEN = 6
-
-    # structures for holding formst information
-    filedetails = {}
-    iddetails = {}
-
-    # all files in report
-    files = []
-
-    hashtype = None
 
     hashes = ["md5", "sha1", "sha256", "sha512", "crc"]
     fileheaders = [
@@ -74,6 +63,8 @@ class SFYAMLHandler:
         "gz": "x-fmt/266",
         "tar": "x-fmt/265",
         "warc": "fmt/289",
+        "arc": "x-fmt/219",
+        "arc_1": "fmt/410",
     }
 
     mismatch_warning = "extension mismatch"
@@ -88,9 +79,7 @@ class SFYAMLHandler:
     xml_basis = "xml match"
 
     PROCESSING_ERROR = -1
-    filecount = 0
 
-    sfdata = {}
     DICTHEADER = "header"
     DICTFILES = "files"
     DICTID = "identification"
@@ -111,6 +100,25 @@ class SFYAMLHandler:
     FIELDEXT = "ext"
     FIELDVERSION = "version"
 
+    def __init__(self):
+        # date handler class
+        self.pydate = PyDateHandler()
+        self.sectioncount = 0
+        self.identifiercount = 0
+        self.header = {}
+        self.hashtype = None
+
+        # Structures for holding forms information.
+        self.filedetails = {}
+        self.iddetails = {}
+
+        # All files in report.
+        self.files = []
+
+        self.filecount = 0
+
+        self.sfdata = {}
+
     def getHeaders(self):
         return self.sfdata[self.DICTHEADER]
 
@@ -126,7 +134,8 @@ class SFYAMLHandler:
     def getFiles(self):
         return self.sfdata[self.DICTFILES]
 
-    def stripkey(self, line):
+    @staticmethod
+    def stripkey(line):
         line = line.strip()
         line = line.replace("- ", "")
         return line
@@ -136,9 +145,17 @@ class SFYAMLHandler:
         line = line.lstrip("'").rstrip("'")
         return self.escapevalue(line)
 
-    # in case we have a value that has a single quote in it
-    # we can escape it here... (in future use params http://stackoverflow.com/a/12066822)
-    def escapevalue(self, line):
+    @staticmethod
+    def escapevalue(line):
+        """Escape values with single quotes in them.
+
+        Alternative for future reference:
+
+           * http://stackoverflow.com/a/12066822)
+
+        :params line: A line of YAML from Siegfried (string)
+        :returns: Escaped version of the input line (string)
+        """
         return line.replace("'", "''")
 
     def handleentry(self, line):
@@ -171,7 +188,7 @@ class SFYAMLHandler:
         fname = filedict[self.FIELD_FILE_NAME]
         file_uri = self.addFileURI(fname)
         if filedict[self.FIELDTYPE] == "Container":
-            file_uri = self.addContainerURI(filedict, filedict, file_uri)
+            file_uri = self.addContainerURI(filedict, file_uri)
         filedict[self.FIELDURI] = file_uri
         filedict[self.FIELDURISCHEME] = self.geturischeme(file_uri)
 
@@ -222,15 +239,13 @@ class SFYAMLHandler:
                     if s[0] == "warning":
                         if s[1] == "":
                             s[1] = None
-                        self.getMethod(s[1], iddata, filedict, True)
+                        self.getMethod(s[1], iddata, True)
                         self.getMismatch(s[1], iddata)
                     if s[0] == "mime":
                         if s[1] == "UNKNOWN" or s[1] == "":
                             s[1] = "none"
                     iddata[s[0]] = s[1]
 
-        # TODO: Add tests to make sure the file URI is constructed
-        # correctly.
         self.add_file_uri(filedict)
 
         if self.FIELDVERSION not in iddata:
@@ -287,7 +302,7 @@ class SFYAMLHandler:
             else:
                 iddata[self.FIELDMISMATCH] = False
 
-    def getMethod(self, basis, iddata, filedict=False, warning=False):
+    def getMethod(self, basis, iddata, warning=False):
         if warning is False and basis is not None:
             if self.container_basis_one in basis or self.container_basis_two in basis:
                 iddata[self.FIELDMETHOD] = "Container"
@@ -315,15 +330,16 @@ class SFYAMLHandler:
             if self.FIELDMETHOD not in iddata:
                 iddata[self.FIELDMETHOD] = method
 
-    def getDirName(self, filepath):
+    @staticmethod
+    def getDirName(filepath):
         return os.path.dirname(filepath)
 
-    def getFileName(self, filepath):
+    @staticmethod
+    def getFileName(filepath):
         fname = os.path.basename(filepath)
         if len(fname) == len(filepath):
-            # retrieving filename probably didn't work... maybe windows path
-            import ntpath  # imported in Windows when OS is imported
-
+            # Retrieving filename probably didn't work... maybe windows
+            # path.
             fname = ntpath.basename(filepath)
         return os.path.basename(fname)
 
@@ -364,14 +380,15 @@ class SFYAMLHandler:
             else:
                 filedict[self.FIELDTYPE] = self.TYPEFILE
 
-    def addFileURI(self, fname):
+    @staticmethod
+    def addFileURI(filename):
         """Creates a file URI for a given path.
 
-        :param fname: ...
-        :returns: ...
+        :param filename: filename (string)
+        :returns: filename as URI (string)
         """
 
-        fname = fname.replace("\\", "/")
+        fname = filename.replace("\\", "/")
         # PY3 compatibility.
         try:
             test = request.pathname2url(fname.encode("utf-8"))
@@ -385,23 +402,24 @@ class SFYAMLHandler:
             fname = urllib.unquote(fname)
         return fname
 
-    def addContainerURI(self, container, containedfile, fname):
+    def addContainerURI(self, container, filename):
         """Creates a container URI for a given path.
 
-        :param container: ...
-        :param containedfile: ...
-        :param fname: ...
-        :returns: ...
+        :param container: container object (dict)
+        :param filename: filename (string)
+        :returns: A modified file URI with the attached container URI
+            scheme. If the second arc URI variant the prefix is
+            corrected to remove _1 suffix (string)
         """
-
-        fname = fname
+        fname = filename
         fname = container[self.FIELDCONTTYPE] + ":" + fname
         fname = fname.replace(
             container[self.FIELD_FILE_NAME], container[self.FIELD_FILE_NAME] + "!"
         )
-        return fname
+        return fname.replace("arc_1", "arc")
 
-    def geturischeme(self, fname):
+    @staticmethod
+    def geturischeme(fname):
         try:
             return parse.urlparse(fname).scheme
         except NameError:
