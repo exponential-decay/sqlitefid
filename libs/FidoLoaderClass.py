@@ -30,10 +30,8 @@ class FidoLoader:
     fido_header = '"info.status","info.time","info.puid","info.formatname","info.signaturename","info.filesize","info.filename","info.mimetype","info.matchtype"'
     basedb = ""
 
-    # TODO PY3: Revert these to True, and False respectively once Fido
-    # tests have been implemented.
-    delete = False
-    BOM = True
+    delete = True
+    BOM = False
 
     def __init__(self, basedb):
         """Initializes the FidoLoader class."""
