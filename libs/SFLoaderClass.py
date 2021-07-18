@@ -39,31 +39,22 @@ class SFLoader:
         return ins
 
     def addDirsToDB(self, dirs, cursor):
-        for d in dirs:
-            if "/" not in d:
-                name = d.rsplit("\\", 1)
+        """Insert a directory entry from the Siegfried report into the
+        database.
+        """
+        for dir_ in dirs:
+            if "/" not in dir_:
+                name = dir_.rsplit("\\", 1)
             else:
-                name = d.rsplit("/", 1)
-            if len(name) == 2:
+                name = dir_.rsplit("/", 1)
+            try:
                 name = name[1]
-            else:
-                name = d
-            insert = (
-                "INSERT INTO "
-                + self.basedb.FILEDATATABLE
-                + " ("
-                + "FILE_PATH, DIR_NAME, NAME,SIZE, TYPE"
-                + ")"
-                + "VALUES ('"
-                + d
-                + "','"
-                + d
-                + "','"
-                + name
-                + "',0,'Folder'"
-                + ");"
+            except IndexError:
+                name = dir_
+            ins = "INSERT INTO {} (FILE_PATH, DIR_NAME, NAME,SIZE, TYPE) VALUES ('{}', '{}', '{}', 0, 'Folder');".format(
+                self.basedb.FILEDATATABLE, dir_, dir_, name
             )
-            cursor.execute(insert)
+            cursor.execute(ins)
 
     def handleID(self, idsection, idkeystring, idvaluestring, nsdict):
         idk = []
