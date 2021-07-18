@@ -33,7 +33,7 @@ def test_get_datestring_without_timezone(date_string, year):
         ("nonsense-data", None),
     ],
 )
-def test_getYear(date_string, year):
+def test_get_year(date_string, year):
     sfhandler = SFHandlerClass.SFYAMLHandler()
-    res = sfhandler.getYear(date_string)
+    res = sfhandler.get_year(date_string)
     assert res == year

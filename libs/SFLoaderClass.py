@@ -11,8 +11,6 @@ into the sqlite db.
 
 from __future__ import absolute_import
 
-import logging
-
 if __name__.startswith("sqlitefid"):
     from sqlitefid.libs.SFHandlerClass import SFYAMLHandler
     from sqlitefid.libs.ToolMappingClass import ToolMapping
@@ -22,7 +20,10 @@ else:
 
 
 class SFLoader:
-    """SFLoader."""
+    """SFLoader class contains functions needed to systematically
+    walk through a parsed Siegfried export and load that information
+    into a sqlite database.
+    """
 
     basedb = ""
     identifiers = ""
@@ -30,13 +31,13 @@ class SFLoader:
     def __init__(self, basedb):
         self.basedb = basedb
 
-    def insertfiledbstring(self, keys, values):
+    def insert_file_db_string(self, keys, values):
         ins = "INSERT INTO {} ({}) VALUES ({});".format(
             self.basedb.FILEDATATABLE, keys.strip(", "), values.strip(", ")
         )
         return ins
 
-    def insertiddbstring(self, keys, values):
+    def insert_id_db_string(self, keys, values):
         ins = "INSERT INTO {} ({}) VALUES ({});".format(
             self.basedb.IDTABLE, keys.strip(", "), values.strip(", ")
         )
@@ -48,7 +49,7 @@ class SFLoader:
         )
         return ins
 
-    def addDirsToDB(self, dirs, cursor):
+    def add_dirs_to_db(self, dirs, cursor):
         """Insert a directory entry from the Siegfried report into the
         database.
         """
@@ -61,45 +62,43 @@ class SFLoader:
                 name = name[1]
             except IndexError:
                 name = dir_
-            ins = "INSERT INTO {} (FILE_PATH, DIR_NAME, NAME,SIZE, TYPE) VALUES ('{}', '{}', '{}', 0, 'Folder');".format(
-                self.basedb.FILEDATATABLE, dir_, dir_, name
+            ins = u"INSERT INTO {0} (FILE_PATH, DIR_NAME, NAME,SIZE, TYPE) VALUES ('{1}', '{1}', '{2}', 0, 'Folder');".format(
+                self.basedb.FILEDATATABLE, dir_, name
             )
             cursor.execute(ins)
 
-    def handleID(self, idsection, idkeystring, idvaluestring, nsdict):
-        idk = []
-        idv = []
-        for x in self.identifiers:
-            for key, value in idsection[x].items():
-                if key in ToolMapping.SF_ID_MAP:
-                    idkeystring = idkeystring + ToolMapping.SF_ID_MAP[key] + ", "
-                    idvaluestring = "{}'{}', ".format(idvaluestring, value)
-                # unmapped: Basis and Warning
-            if x in nsdict:
-                idkeystring = idkeystring + self.basedb.NSID
-                idvaluestring = "{}{}".format(idvaluestring, nsdict[x])
-            else:
-                logging.error(
-                    "Issue with namespace dictionary table, can't find: %s", x
-                )
-            idk.append(idkeystring.strip(", "))
-            idv.append(idvaluestring.strip(", "))
-            idkeystring = ""
-            idvaluestring = ""
-        return idk, idv
+    def generate_id_insert(self, id_records, namespace_dict):
+        """Generate the information needed to become an insert statement
+        for sqlite. The general form 'INSERT INTO {} () VALUES ();' is
+        required by the caller, and so we generate two lists that can
+        then be used to build that.
 
-    def populateNStable(self, sf, cursor, header):
+        :param id_records: List of identification records that all need
+            adding to the IDDATA table in the database (list)
+        :param namespace_dict: Lookup table of ID sources, e.g. LOC,
+            PRONOM etc. and indices (dict)
+        :return: header_list (list), value_list (list)
+        """
+
+        header_list = []
+        value_list = []
+
+        HEADERS = "ID, FORMAT_NAME, FORMAT_VERSION, MIME_TYPE, METHOD, BASIS, WARNING, EXTENSION_MISMATCH, STATUS, NS_ID"
+
+        for id_ in id_records:
+            header_list.append(HEADERS)
+            value_list.append(id_.to_csv_list(namespace_dict.get(id_.ns)))
+
+        return header_list, value_list
+
+    def populate_namespace_table(self, sf, cursor, header):
         nsdict = {}
-        # N.B. Not handling: sig.sig name
-        # N.B. Not handling: scandate
-        # N.B. Not handling: siegfried version
         count = header[sf.HEADCOUNT]
         nstext = sf.HEADNAMESPACE
         detailstext = sf.HEADDETAILS
-        for h in range(count):
-            no = h + 1
-            ns = "{}{}".format(nstext, no)
-            details = "{}{}".format(detailstext, no)
+        for idx in range(1, count + 1):
+            ns = "{} {}".format(nstext, idx)
+            details = "{} {}".format(detailstext, idx)
             ins = "INSERT INTO {} (NS_NAME, NS_DETAILS) VALUES ('{}', '{}');".format(
                 self.basedb.NAMESPACETABLE, header[ns], header[details]
             )
@@ -107,77 +106,76 @@ class SFLoader:
             nsdict[str(header[ns])] = cursor.lastrowid
         return nsdict
 
-    def handledirectories(self, dirs, sf, count=False):
+    def handle_directories(self, dirs, sf, count=False):
         newlist = []
         dirset = set(dirs)
-        for d in dirset:
-            newlist.append(sf.getDirName(d))
+        for dir_ in dirset:
+            newlist.append(sf.getDirName(dir_))
         newlist = set(newlist)
         dirset = list(dirset) + list(newlist)
         if count is False:
-            return self.handledirectories(dirset, sf, len(dirset))
+            return self.handle_directories(dirset, sf, len(dirset))
         if len(dirset) != count:
-            return self.handledirectories(dirset, sf, len(dirset))
+            return self.handle_directories(dirset, sf, len(dirset))
         return dirset
 
-    def create_sf_database(self, sfexport, cursor):
+    def create_sf_database(self, sf_export, cursor):
+        """Generate the insert commands and execute them on an sqlite
+        instance to create the analysis database.
+        """
         sf = SFYAMLHandler()
-        sf.readSFYAML(sfexport)
+        sf.read_sf_yaml(sf_export)
 
-        headers = sf.getHeaders()
+        headers = sf.get_headers()
         self.basedb.tooltype = "siegfried: {}".format(headers["siegfried"])
 
         sfdata = sf.sfdata
 
-        sf.addfilename(sfdata)
-        sf.adddirname(sfdata)
-        sf.addYear(sfdata)
-        sf.addExt(sfdata)
+        sf.add_file_name(sfdata)
+        sf.add_dir_name(sfdata)
+        sf.add_year(sfdata)
+        sf.add_extension(sfdata)
 
-        self.identifiers = sf.getIdentifiersList()
-        nsdict = self.populateNStable(sf, cursor, headers)
+        nsdict = self.populate_namespace_table(sf, cursor, headers)
 
         dirlist = []
 
-        # Awkward structures to navigate----------#
-        # sf.sfdata['header']                     #
-        # sf.sfdata['files']                      #
-        # sf.sfdata['files'][0]['identification'] #
-        # ----------------------------------------#
-        for f in sf.getFiles():
+        for file_entry in sf.get_files():
             filekeystring = ""
             filevaluestring = ""
-            idkeystring = ""
-            idvaluestring = ""
-            for key, value in f.items():
+
+            for key, value in file_entry.items():
                 if key in ToolMapping.SF_FILE_MAP:
-                    filekeystring = filekeystring + ToolMapping.SF_FILE_MAP[key] + ", "
-                    if not isinstance(value, int):
+                    filekeystring = "{}{}, ".format(
+                        filekeystring, ToolMapping.SF_FILE_MAP[key]
+                    )
+                    try:
                         if not isinstance(value, str):
-                            tmp = value.encode("utf-8")
+                            val = value.encode("utf-8")
                         else:
-                            tmp = value
-                    else:
-                        tmp = value
-                    filevaluestring = "{}'{}', ".format(filevaluestring, tmp)
-                if key == sf.FIELDDIRNAME:
+                            val = value
+                    except AttributeError:
+                        val = value
+                    filevaluestring = "{}'{}', ".format(filevaluestring, val)
+                if key == sf.FIELD_DIR_NAME:
                     dirlist.append(value)
-                else:
-                    if key == sf.DICTID:
-                        idkey, idvalue = self.handleID(
-                            value, idkeystring, idvaluestring, nsdict
-                        )
+                    continue
+                if key == sf.DICTID:
+                    idkey, idvalue = self.generate_id_insert(
+                        id_records=value, namespace_dict=nsdict
+                    )
 
             fileid = None
 
             if filekeystring != "" and filevaluestring != "":
-                cursor.execute(self.insertfiledbstring(filekeystring, filevaluestring))
+                ins = self.insert_file_db_string(filekeystring, filevaluestring)
+                cursor.execute(ins)
                 fileid = cursor.lastrowid
 
             insert = []
             for idx, value in enumerate(idkey):
                 insert.append(
-                    self.insertiddbstring("".join(value), "".join(idvalue[idx]))
+                    self.insert_id_db_string("".join(value), "".join(idvalue[idx]))
                 )
 
             rowlist = []
@@ -193,4 +191,4 @@ class SFLoader:
 
         # Finally, add directories to the file table.
         uniquedirs = set(dirlist)
-        self.addDirsToDB(uniquedirs, cursor)
+        self.add_dirs_to_db(uniquedirs, cursor)

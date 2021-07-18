@@ -9,10 +9,7 @@ import pytest
 
 from sqlitefid.libs.GenerateBaselineDBClass import GenerateBaselineDB
 
-if sys.version_info[0] == 3:
-    PY3 = True
-else:
-    PY3 = False
+PY3 = bool(sys.version_info[0] == 3)
 
 
 FIDDatabase = collections.namedtuple("FIDDatabase", "baseline cursor")

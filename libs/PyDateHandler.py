@@ -15,7 +15,7 @@ import re
 class PyDateHandler:
     """PyDateHandler."""
 
-    def getYear(self, datestring):
+    def get_year(self, datestring):
         """Return year from given datestring."""
         if datestring != "":
             datestring = self.get_datestring_without_timezone(datestring)
@@ -31,7 +31,11 @@ class PyDateHandler:
         :returns: simplified date string without timezone, year if data
             isn't available, or None if a conversion cannot be made.
         """
-        newdate = False
+        # If an error occurred during scanning we will get odd values.
+        # This seems to be the default for when that happens.
+        if date_value.startswith("0001-01-01T00:00:00"):
+            return None
+        newdate = None
         datestring = date_value.replace("Z", "")
         if len(datestring) == len("0000-00-00T00:00:00+00:00"):
             if "+" in datestring:
@@ -48,11 +52,8 @@ class PyDateHandler:
             logging.error(
                 "Problem in getYear function, likely due to timezone issues: %s", err
             )
-
-        if newdate is not False:
+        if newdate:
             return newdate
-
-        newdate = None
         testyear = datestring.split("-")[0]
         validyear = re.compile(r"^\d{4}$")
         if len(testyear) == 4 and re.search(validyear, testyear) is not None:

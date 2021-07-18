@@ -4,13 +4,12 @@ from __future__ import absolute_import
 
 import csv
 
-# TODO: noqa below is temporary. The unicode type is not supported in
-# Python 3 and so it is likely we'll hit this error at some point.
+# The unicode type is not supported in Python 3 and so we may hit this error at
+# some point. Testing has shown we haven't so far.
 #
 # flake8: noqa
 
-# TODO PY3: The majority of this piece is not expected to work in the
-# final PY3 version. Original code:
+# Original code:
 #
 #   https://github.com/jdunck/python-unicodecsv
 #

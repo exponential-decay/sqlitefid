@@ -42,39 +42,53 @@ else:
 args = None
 
 
-def identifyinput(export):
+def identify_and_process_input(report_path):
+    """Identify an input from a given path and process the results if
+    there is support.
+
+    :param report_path: path to a format identification report (String)
+    :return: path to the processed sqlite3 database (String)
+    """
+    export = report_path
     id_ = IdentifyExport()
     type_ = id_.exportid(export)
     if type_ == id_.DROIDTYPE:
-        handleDROIDCSV(export)
-        return
+        return handleDROIDCSV(export)
     if type_ == id_.DROIDTYPEBOM:
-        handleDROIDCSV(export, True)
-        return
+        return handleDROIDCSV(export, True)
     if type_ == id_.SFTYPE:
-        handleSFYAML(export)
-        return
+        return handleSFYAML(export)
     if type_ == id_.FIDOTYPE:
-        handleFIDOCSV(export)
-        return
+        return handleFIDOCSV(export)
     if type_ == id_.SFCSVTYPE:
         logging.info("Siegfried CSV. Not currently handled")
-        return
+        return None
     if type_ == id_.UNKTYPE:
         logging.info("Unknown export type")
-        return
+        return None
 
 
 def handleDROIDCSV(droidcsv, BOM=False):
-    basedb = GenerateBaselineDB(droidcsv, args.debug)
-    loader = DROIDLoader(basedb, BOM, debug=args.debug)
+    debug = False
+    try:
+        debug = args.debug
+    except AttributeError:
+        pass
+    basedb = GenerateBaselineDB(droidcsv, debug)
+
+    loader = DROIDLoader(basedb, BOM, debug=debug)
     loader.create_droid_database(droidcsv, basedb.getcursor())
     basedb.closedb()
     return basedb.dbname
 
 
 def handleSFYAML(sfexport):
-    basedb = GenerateBaselineDB(sfexport, args.debug)
+    debug = False
+    try:
+        debug = args.debug
+    except AttributeError:
+        pass
+    basedb = GenerateBaselineDB(sfexport, debug)
     loader = SFLoader(basedb)
     loader.create_sf_database(sfexport, basedb.getcursor())
     basedb.closedb()
@@ -130,7 +144,7 @@ def main():
         logging.error("Not a file: %s", args.export)
         sys.exit(1)
 
-    identifyinput(args.export)
+    identify_and_process_input(args.export)
     outputtime(start_time)
 
 

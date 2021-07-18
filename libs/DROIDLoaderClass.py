@@ -113,14 +113,13 @@ class DROIDLoader:
             # Multiple identification fields.
             METHOD = file["METHOD"]
             if METHOD == "":
-                METHOD = "None"
+                METHOD = None
             STATUS = file["STATUS"]
             MISMATCH = file["EXTENSION_MISMATCH"]
             if MISMATCH == "true":
-                MISMATCH = "True"
+                MISMATCH = True
             else:
-                MISMATCH = "False"
-
+                MISMATCH = False
             MULTIPLE = False
             MULTIPLE_DONE = False
             try:
@@ -143,9 +142,8 @@ class DROIDLoader:
                     continue
                 if key in ("MIME_TYPE", "METHOD"):
                     if value == "":
-                        value = "None"
-                if self.basedb.hashtype is False:
-                    self.basedb.hashtype = "None"
+                        value = None
+                if self.basedb.hashtype is None:
                     if "_HASH" in key:
                         self.basedb.hashtype = key.split("_", 1)[0]
                 if key in ToolMapping.DROID_FILE_MAP:
@@ -157,9 +155,10 @@ class DROIDLoader:
                 if MULTIPLE is False:
                     if key in ToolMapping.DROID_ID_MAP:
                         if key == "EXTENSION_MISMATCH":
-                            value = "False"
                             if value == "true":
-                                value = "True"
+                                value = True
+                            else:
+                                value = False
                         idkeystring = u"{}{}, ".format(
                             idkeystring, ToolMapping.DROID_ID_MAP[key]
                         )

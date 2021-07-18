@@ -41,10 +41,8 @@ class ToolMapping:
     }
 
     SF_FILE_MAP = {
-        # "_" : "INPUT_ID",
-        # "_" : "PARENT_ID",
         "uri": "URI",
-        "uri scheme": "URI_SCHEME",
+        "uri_scheme": "URI_SCHEME",
         "filename": "FILE_PATH",
         "directory": "DIR_NAME",
         "name": "NAME",
@@ -68,11 +66,6 @@ class ToolMapping:
         "mime": "MIME_TYPE",
         "format": "FORMAT_NAME",
         "version": "FORMAT_VERSION",  # no version in tika or freedesktop ids
-        "extension mismatch": "EXTENSION_MISMATCH",
-        "warning": "WARNING"
-        #
-        # Unmapped fields between DROID standard, and Siegfried.
-        #
-        #    * 'STATUS' : 'STATUS',
-        #    * 'FORMAT_COUNT' : 'FORMAT_COUNT'  #mismatch extends into multiple namespace records
+        "extension_mismatch": "EXTENSION_MISMATCH",
+        "warning": "WARNING",
     }

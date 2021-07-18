@@ -65,13 +65,12 @@ class GenerateBaselineDB:
     # NAMESPACE_TABLE
     NS_TABLE = [NSID, "NS_NAME", "NS_DETAILS"]
 
-    dbname = ""
-    timestamp = ""
-    cursor = ""
-    hashtype = False
-    tooltype = False
-
     def __init__(self, export, debug=False):
+        self.dbname = None
+        self.timestamp = None
+        self.cursor = None
+        self.hashtype = None
+        self.tooltype = None
         self.log = debug
         self.dbname = self.getDBFilename(export)
         self.dbsetup()

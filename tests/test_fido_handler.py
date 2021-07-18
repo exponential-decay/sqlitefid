@@ -18,10 +18,7 @@ OK,14,fmt/938,"Python Script File","External",0,"__init__.py","None","extension"
 OK,14,fido-fmt/python,"Python script file","External",0,"__init__.py","None","extension"
 OK,9,fmt/939,"Python Compiled File","PYC 2.7",159,"__init__.pyc","None","signature"""
 
-if sys.version_info[0] == 3:
-    PY3 = True
-else:
-    PY3 = False
+PY3 = bool(sys.version_info[0] == 3)
 
 
 def _StringIO():

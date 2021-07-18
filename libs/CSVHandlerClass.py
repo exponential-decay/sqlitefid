@@ -44,7 +44,7 @@ class GenericCSVHandler:
         self.BOM = BOM
 
     @staticmethod
-    def __getCSVheaders__(header_row):
+    def _getCSVheaders(header_row):
         """Retrieve CSV headers from first row."""
         header_list = []
         for header in header_row:
@@ -67,7 +67,7 @@ class GenericCSVHandler:
         csvreader = unicodecsv.reader(csvfile)
         for row in csvreader:
             if csvreader.line_num == 1:  # not zero-based index
-                header_list = self.__getCSVheaders__(row)
+                header_list = self._getCSVheaders(row)
                 columncount = len(header_list)
             else:
                 csv_dict = {}
@@ -129,7 +129,7 @@ class GenericCSVHandler:
                     # first we need to retrieve the header information from the first line
                     if lineno == 0:
                         for row in csvreader:
-                            header_list = self.__getCSVheaders__(row)
+                            header_list = self._getCSVheaders(row)
                             columncount = len(header_list)
 
                     for row in csvreader:
@@ -228,11 +228,11 @@ class DroidCSVHandler:
         return droid_list
 
     def getYear(self, datestring):
-        return self.pydate.getYear(datestring)
+        return self.pydate.get_year(datestring)
 
     def addYear(self, droid_list):
         for row in droid_list:
-            if row["LAST_MODIFIED"] == "":
+            if row["LAST_MODIFIED"] != "":
                 row["YEAR"] = self.getYear(row["LAST_MODIFIED"])
         return droid_list
 
