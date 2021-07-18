@@ -1,19 +1,10 @@
 # -*- coding: utf-8 -*-
 
-# TODO: Come back to this...
+# TODO RENAME
 
-from __future__ import absolute_import
-
-import collections
-import io
 import sys
 
-import pytest
-
-from sqlitefid.libs import PyDateHandler, SFHandlerClass
-from sqlitefid.libs.GenerateBaselineDBClass import GenerateBaselineDB
 from sqlitefid.libs.SFHandlerClass import SFYAMLHandler
-from sqlitefid.libs.SFLoaderClass import SFLoader
 
 SIEGFRIED_YAML = u"""---
 siegfried   : 1.9.1
@@ -135,7 +126,7 @@ matches  :
     basis   : 'extension match pdf; byte match at 0, 4'
     warning :
 ---
-filename : 'Q42591.mp3'
+filename : 'Q42591🖤.mp3'
 filesize : 3
 modified : 2021-07-08T23:21:40+02:00
 errors   :
@@ -175,67 +166,149 @@ else:
     PY3 = False
 
 
-def _StringIO():
-    if PY3 is True:
-        return io.StringIO()
-    return io.BytesIO()
-
-
-FIDDatabase = collections.namedtuple("FIDDatabase", "baseline cursor")
-
-
-@pytest.fixture(scope="function")
-def database(tmp_path):
-    """Create a baseline database for each of the tests below.
-
-    :returns: Yielded named tuple containing a baseline db object
-        (GenerateBaselineDB) and database cursor object (sqlite3.Cursor)
+def test_read_sf_yaml(tmp_path):
+    """Ensure that the SF data above can be properly parsed and outputs
+    sensible data.
     """
-    basedb = GenerateBaselineDB("sf_test.yaml")
 
     dir_ = tmp_path
-    droid_csv = dir_ / "sf_test.yaml"
-    droid_csv.write_text(SIEGFRIED_YAML.strip())
+    sf_yaml = dir_ / "sf_test.yaml"
+    sf_yaml.write_text(SIEGFRIED_YAML.strip())
 
     sf = SFYAMLHandler()
-    sf.readSFYAML(str(droid_csv))
-    headers = sf.getHeaders()
+    sf.readSFYAML(str(sf_yaml))
 
-    basedb.tooltype = "siegfried: {}".format(headers["siegfried"])
-    basedb.dbname = "file::memory:?cache=shared"
+    assert sf.sectioncount == 5
+    paths = [u"{}".format(f["filename"]) for f in sf.files]
 
-    connection = FIDDatabase(basedb, basedb.dbsetup())
+    assert (
+        list(set(paths)).sort()
+        == ["Q10287816.gz", "Q42591🖤.mp3", "Q42332.pdf", "Q28205479.info"].sort()
+    )
 
-    yield connection
+    files = sf.sfdata["files"]
 
+    assert len(sf.files) == 4
+    assert len(files) == 4
 
-def test_create_db_md(database, tmp_path):
-    basedb = database.baseline
-    cursor = database.cursor
-    dir_ = tmp_path
-    droid_csv = dir_ / "sf_test.yaml"
-    droid_csv.write_text(SIEGFRIED_YAML.strip())
-    basedb.timestamp = "timestamp_value"
-    basedb.createDBMD(cursor)
-    res = cursor.execute("select * from DBMD").fetchall()
-    # assert res == [('timestamp_value', 'False', 'siegfried: 1.9.1')]
+    assert files[0] == {
+        "filename": "Q10287816.gz",
+        "filesize": "3",
+        "modified": "2021-05-24T19:26:56+02:00",
+        "errors": "",
+        "md5": "613ffd2ae0a8828aa573ce62bf2e30c3",
+        "type": "Container",
+        "containertype": "gz",
+        "uri": "gz:file:///Q10287816.gz!",
+        "uri scheme": "gz",
+        "identification": {
+            "pronom": {
+                "id": "x-fmt/266",
+                "format": "GZIP Format",
+                "version": "",
+                "mime": "application/gzip",
+                "method": "Signature",
+                "basis": "extension match gz; byte match at 0, 3",
+                "warning": None,
+            },
+            "tika": {
+                "id": "application/gzip",
+                "format": "Gzip Compressed Archive",
+                "mime": "application/gzip",
+                "method": "Signature",
+                "basis": "extension match gz; byte match at 0, 2 (signature 1/2); byte match at 0, 2 (signature 2/2)",
+                "warning": None,
+                "version": "",
+            },
+            "freedesktop.org": {
+                "id": "application/gzip",
+                "format": "Gzip archive",
+                "mime": "application/gzip",
+                "method": "Signature",
+                "basis": "extension match gz; byte match at 0, 2",
+                "warning": None,
+                "version": "",
+            },
+            "loc": {
+                "id": "UNKNOWN",
+                "format": "",
+                "mime": "none",
+                "basis": None,
+                "method": "None",
+                "extension mismatch": False,
+                "warning": "no match",
+                "version": "",
+            },
+        },
+    }
 
+    assert files[3] == {
+        "filename": u"Q42591🖤.mp3",
+        "filesize": "3",
+        "modified": "2021-07-08T23:21:40+02:00",
+        "errors": "",
+        "md5": "c0f44879dc0d4eae7b3f0b3e801e373c",
+        "type": "File",
+        "uri": "file:///Q42591🖤.mp3",
+        "uri scheme": "file",
+        "identification": {
+            "pronom": {
+                "id": "UNKNOWN",
+                "format": "",
+                "version": "",
+                "mime": "none",
+                "basis": None,
+                "method": "None",
+                "extension mismatch": False,
+                "warning": "no match; possibilities based on extension are fmt/134",
+            },
+            "tika": {
+                "id": "audio/mpeg",
+                "format": "MPEG-1 Audio Layer 3",
+                "mime": "audio/mpeg",
+                "method": "Signature",
+                "basis": "extension match mp3; byte match at 0, 3 (signature 12/12)",
+                "warning": None,
+                "version": "",
+            },
+            "freedesktop.org": {
+                "id": "audio/mpeg",
+                "format": "MP3 audio",
+                "mime": "audio/mpeg",
+                "method": "Signature",
+                "basis": "extension match mp3; byte match at 0, 3 (signature 2/2)",
+                "warning": None,
+                "version": "",
+            },
+            "loc": {
+                "id": "UNKNOWN",
+                "format": "",
+                "mime": "none",
+                "basis": None,
+                "method": "None",
+                "extension mismatch": False,
+                "warning": "no match; possibilities based on extension are fdd000052, fdd000053, fdd000105, fdd000111, fdd000256, fdd000275",
+                "version": "",
+            },
+        },
+    }
 
-def test_sf_handler(database, tmp_path):
-    """Ensure that SF data is written to sqlite as expected."""
+    assert sf.sfdata["header"] == {
+        "siegfried": "1.9.1",
+        "scandate": "2021-07-17T22:11:59+02:00",
+        "signature": "default.sig",
+        "created": "2020-10-06T19:15:15+02:00",
+        "id namespace 1": "pronom",
+        "id details 1": "DROID_SignatureFile_V97.xml; container-signature-20201001.xml",
+        "identifier count": 4,
+        "id namespace 2": "tika",
+        "id details 2": "tika-mimetypes.xml (1.24, 2020-04-17)",
+        "id namespace 3": "freedesktop.org",
+        "id details 3": "freedesktop.org.xml (2.0, 2020-06-05)",
+        "id namespace 4": "loc",
+        "id details 4": "fddXML.zip (2020-09-02, DROID_SignatureFile_V97.xml, container-signature-20201001.xml)",
+    }
 
-    basedb = database.baseline
-    cursor = database.cursor
-
-    dir_ = tmp_path
-    droid_csv = dir_ / "sf_test.yaml"
-    droid_csv.write_text(SIEGFRIED_YAML.strip())
-
-    sfloader = SFLoader(basedb)
-    # sfloader.create_sf_database(str(droid_csv), cursor)
-
-    # res = cursor.execute("select * from DBMD").fetchall()
-
-    # print(res)
-
-    # assert False
+    assert sf.hashtype == "md5"
+    assert sf.identifiercount == 4
+    assert sf.filecount == 4
