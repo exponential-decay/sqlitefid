@@ -60,12 +60,14 @@ OK,7,fmt/729,"SQLite Database File Format","SQLite Database",40960,"data/sf.db",
 KO,7,,,,5426,"diff",,"fail"
 """
 
+
 def test_identify_export_sf(tmp_path):
     dir_ = tmp_path
     input_file = dir_ / "sf_test.yaml"
     input_file.write_text(SIEGFRIED_YAML.strip())
     res = IdentifyExport().exportid(str(input_file))
     assert res == IdentifyExport().SFTYPE
+
 
 def test_identify_export_sf_csv(tmp_path):
     dir_ = tmp_path
@@ -74,12 +76,14 @@ def test_identify_export_sf_csv(tmp_path):
     res = IdentifyExport().exportid(str(input_file))
     assert res == IdentifyExport().SFCSVTYPE
 
+
 def test_identify_export_droid(tmp_path):
     dir_ = tmp_path
     input_file = dir_ / "sf_test.yaml"
     input_file.write_text(DROID_CSV.strip())
     res = IdentifyExport().exportid(str(input_file))
     assert res == IdentifyExport().DROIDTYPE
+
 
 def test_identify_export_droid_bom(tmp_path):
     dir_ = tmp_path
@@ -88,12 +92,14 @@ def test_identify_export_droid_bom(tmp_path):
     res = IdentifyExport().exportid(str(input_file))
     assert res == IdentifyExport().DROIDTYPEBOM
 
+
 def test_identify_export_fido(tmp_path):
     dir_ = tmp_path
     input_file = dir_ / "sf_test.yaml"
     input_file.write_text(FIDO_CSV.strip())
     res = IdentifyExport().exportid(str(input_file))
     assert res == IdentifyExport().FIDOTYPE
+
 
 def test_identify_export_unk(tmp_path):
     dir_ = tmp_path

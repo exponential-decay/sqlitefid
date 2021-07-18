@@ -1,5 +1,16 @@
 # -*- coding: utf-8 -*-
 
+# Disable pylint warnings for CSVHandlerClass imports which are not
+# straightforward as we try and handle PY2 and PY3.
+#
+# pylint: disable=E0611,E0401
+
+"""sqlitefid is the primary entry point for the sqlitefid application.
+The application takes a format identification report, e.g. DROID or
+Siegfried and maps it to a sqlite database for higher performance
+analysis of format identification results.
+"""
+
 from __future__ import absolute_import
 
 import argparse
@@ -28,27 +39,33 @@ else:
     from sqlitefid.libs.SFLoaderClass import SFLoader
     from sqlitefid.libs.Version import SqliteFIDVersion
 
+args = None
+
 
 def identifyinput(export):
     id_ = IdentifyExport()
     type_ = id_.exportid(export)
     if type_ == id_.DROIDTYPE:
-        return handleDROIDCSV(export)
-    elif type_ == id_.DROIDTYPEBOM:
-        return handleDROIDCSV(export, True)
-    elif type_ == id_.SFTYPE:
-        return handleSFYAML(export)
-    elif type_ == id_.FIDOTYPE:
-        return handleFIDOCSV(export)
-    elif type_ == id_.SFCSVTYPE:
+        handleDROIDCSV(export)
+        return
+    if type_ == id_.DROIDTYPEBOM:
+        handleDROIDCSV(export, True)
+        return
+    if type_ == id_.SFTYPE:
+        handleSFYAML(export)
+        return
+    if type_ == id_.FIDOTYPE:
+        handleFIDOCSV(export)
+        return
+    if type_ == id_.SFCSVTYPE:
         logging.info("Siegfried CSV. Not currently handled")
-    elif type_ == id_.UNKTYPE:
+        return
+    if type_ == id_.UNKTYPE:
         logging.info("Unknown export type")
-        return None
+        return
 
 
 def handleDROIDCSV(droidcsv, BOM=False):
-    global basedb
     basedb = GenerateBaselineDB(droidcsv, args.debug)
     loader = DROIDLoader(basedb, BOM, debug=args.debug)
     loader.create_droid_database(droidcsv, basedb.getcursor())
@@ -57,7 +74,6 @@ def handleDROIDCSV(droidcsv, BOM=False):
 
 
 def handleSFYAML(sfexport):
-    global basedb
     basedb = GenerateBaselineDB(sfexport, args.debug)
     loader = SFLoader(basedb)
     loader.create_sf_database(sfexport, basedb.getcursor())
@@ -72,10 +88,11 @@ def handleFIDOCSV(fidoexport):
 
 
 def outputtime(start_time):
-    logging.info("--- %s seconds ---", (time.time() - start_time))
+    logging.info("Process took: %s seconds", (time.time() - start_time))
 
 
 def main():
+    """Primary entry point for sqlitefid."""
 
     # 	Usage: 	--csv [droid report]
     # 	Handle command line arguments for the script
@@ -110,7 +127,7 @@ def main():
         sys.exit(0)
 
     if not os.path.isfile(args.export):
-        logging.error("Not a file: {}".format(args.export))
+        logging.error("Not a file: %s", args.export)
         sys.exit(1)
 
     identifyinput(args.export)
