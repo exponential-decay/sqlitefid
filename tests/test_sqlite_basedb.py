@@ -105,7 +105,7 @@ def test_base_db(database):
     basedb.hashtype = "hashtype_value"
     basedb.tooltype = "identification_tool"
 
-    basedb.createDBMD(cursor)
+    basedb.createDBMD()
 
     res = cursor.execute("PRAGMA table_info(DBMD)").fetchall()
 

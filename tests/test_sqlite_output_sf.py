@@ -213,7 +213,7 @@ def test_create_db_md(database, tmp_path):
     droid_csv = dir_ / "sf_test.yaml"
     droid_csv.write_text(SIEGFRIED_YAML.strip())
     basedb.timestamp = "timestamp_value"
-    basedb.createDBMD(cursor)
+    basedb.createDBMD()
     res = cursor.execute("select * from DBMD").fetchall()
     assert res == [("timestamp_value", "False", "siegfried: 1.9.1")]
 

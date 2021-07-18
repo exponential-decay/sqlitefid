@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 
+"""GenerateBaselineDBClass is responsible for setting up the baseline
+sqlite DB we will analyze all identification results with.
+"""
+
 from __future__ import absolute_import
 
 import logging
@@ -8,6 +12,7 @@ import time
 
 
 class GenerateBaselineDB:
+    """GenerateBaselineDB."""
 
     IDTABLE = "IDDATA"
     METADATATABLE = "DBMD"
@@ -90,7 +95,7 @@ class GenerateBaselineDB:
 
     def closedb(self):
         # write MD
-        self.createDBMD(self.cursor)
+        self.createDBMD()
 
         # Save (commit) the changes
         self.conn.commit()
@@ -99,13 +104,15 @@ class GenerateBaselineDB:
         # TO be sure any changes have been committed or they will be lost.
         self.conn.close()
 
-    def getDBFilename(self, export):
-        return export.split(".", 1)[0] + ".db"
+    @staticmethod
+    def getDBFilename(export):
+        return "{}{}".format(export.split(".", 1)[0], ".db")
 
-    def sethashtype(self, hash):
-        self.hashtype = hash
+    def sethashtype(self, hash_):
+        self.hashtype = hash_
 
-    def gettimestamp(self):
+    @staticmethod
+    def gettimestamp():
         return time.strftime("%Y-%m-%dT%H:%M:%S")
 
     def droptables(self, cursor):
@@ -118,9 +125,9 @@ class GenerateBaselineDB:
     def dropTable(self, cursor, tablename):
         # check we have a table to drop
         self.execute_create(
-            "SELECT name FROM sqlite_master WHERE type='table' AND name='"
-            + tablename
-            + "';"
+            "SELECT name FROM sqlite_master WHERE type='table' AND name='{}';".format(
+                tablename
+            )
         )
         # can't drop something that doesn't exist
         if cursor.fetchone() is not None:
@@ -141,7 +148,7 @@ class GenerateBaselineDB:
     def dropNSTable(self, cursor):
         self.dropTable(cursor, self.NAMESPACETABLE)
 
-    def createDBMD(self, cursor):
+    def createDBMD(self):
         create = "CREATE TABLE {} (TIMESTAMP TIMESTAMP, HASH_TYPE, TOOL_TYPE)".format(
             self.METADATATABLE
         )
@@ -151,11 +158,12 @@ class GenerateBaselineDB:
         )
         self.execute_create(ins)
 
-    def createfield(self, table, column, type=False):
-        if type is not False:
-            table = table + str(column) + " " + type + ", "
+    @staticmethod
+    def createfield(table, column, type_=False):
+        if type_ is not False:
+            table = "{}{} {}, ".format(table, column, type_)
         else:
-            table = table + str(column) + ", "
+            table = "{}{}, ".format(table, column)
         return table
 
     def createfiledatatable(self):
@@ -167,7 +175,7 @@ class GenerateBaselineDB:
                 table = self.createfield(table, column, "INTEGER")
             elif column == "FILE_ID":
                 table = self.createfield(table, column, "integer primary key")
-            elif column == "PARENT_ID" or column == "INPUT_ID" or column == "SIZE":
+            elif column in ("PARENT_ID", "INPUT_ID", "SIZE"):
                 table = self.createfield(table, column, "integer")
             else:
                 table = self.createfield(table, column)
@@ -215,6 +223,6 @@ class GenerateBaselineDB:
         self.execute_create("CREATE INDEX PUID ON {} (ID)".format(self.IDTABLE))
 
     def execute_create(self, query):
-        if self.log is not False:  # TODO: toggle output of create queries
+        if self.log is not False:
             logging.info(query)
         return self.cursor.execute(query)
