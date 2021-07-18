@@ -32,20 +32,11 @@ class SFLoader:
             insert + "(" + keys.strip(", ") + ") VALUES (" + values.strip(", ") + ");"
         )
 
-    def file_id_junction_insert(self, file, id):
-        return (
-            "INSERT INTO "
-            + self.basedb.ID_JUNCTION
-            + "("
-            + self.basedb.FILEID
-            + ","
-            + self.basedb.IDID
-            + ") VALUES ("
-            + str(file)
-            + ","
-            + str(id)
-            + ");"
+    def file_id_junction_insert(self, file, id_):
+        ins = "INSERT INTO {} ({}, {}) VALUES ({}, {});".format(
+            self.basedb.ID_JUNCTION, self.basedb.FILEID, self.basedb.IDID, file, id_
         )
+        return ins
 
     def addDirsToDB(self, dirs, cursor):
         for d in dirs:
