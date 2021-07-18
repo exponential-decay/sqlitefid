@@ -1,9 +1,15 @@
 ﻿# -*- coding: utf-8 -*-
 
+"""ToolMappingClass
+
+Mapping of tool output fields to database fields.
+"""
+
 from __future__ import absolute_import
 
 
 class ToolMapping:
+    """ToolMapping."""
 
     DROID_FILE_MAP = {
         "ID": "INPUT_ID",
@@ -23,7 +29,6 @@ class ToolMapping:
         "MD5_HASH": "HASH",
     }
 
-    # file count doesn't have a place yet...
     DROID_ID_MAP = {
         "METHOD": "METHOD",
         "STATUS": "STATUS",
@@ -32,7 +37,7 @@ class ToolMapping:
         "FORMAT_NAME": "FORMAT_NAME",
         "FORMAT_VERSION": "FORMAT_VERSION",
         "EXTENSION_MISMATCH": "EXTENSION_MISMATCH",
-        "FORMAT_COUNT": "FORMAT_COUNT",  # TODO: Remove into namespace tables
+        "FORMAT_COUNT": "FORMAT_COUNT",
     }
 
     SF_FILE_MAP = {
@@ -56,7 +61,6 @@ class ToolMapping:
         "errors": "ERROR",
     }
 
-    # file count doesn't have a place yet...
     SF_ID_MAP = {
         "basis": "BASIS",
         "method": "METHOD",
@@ -66,8 +70,9 @@ class ToolMapping:
         "version": "FORMAT_VERSION",  # no version in tika or freedesktop ids
         "extension mismatch": "EXTENSION_MISMATCH",
         "warning": "WARNING"
-        # -----------------UNMAPPED FIELDS BETWEEN TRAD. DROID AND SIEGFRIED--------------------#
-        # 'STATUS' : 'STATUS',                                                                  #
-        # 'FORMAT_COUNT' : 'FORMAT_COUNT'  #mismatch extends into multiple namespace records    #
-        # --------------------------------------------------------------------------------------#
+        #
+        # Unmapped fields between DROID standard, and Siegfried.
+        #
+        #    * 'STATUS' : 'STATUS',
+        #    * 'FORMAT_COUNT' : 'FORMAT_COUNT'  #mismatch extends into multiple namespace records
     }

@@ -1,5 +1,14 @@
 # -*- coding: utf-8 -*-
 
+# Disable pylint warnings for CSVHandlerClass imports which are not
+# straightforward as we try and handle PY2 and PY3.
+#
+# pylint: disable=E0611,E0401
+
+"""SFLoaderClass is responsible for placing much of the Siegfried data
+into the sqlite db.
+"""
+
 from __future__ import absolute_import
 
 import sys
@@ -13,6 +22,7 @@ else:
 
 
 class SFLoader:
+    """SFLoader."""
 
     basedb = ""
     identifiers = ""
@@ -21,16 +31,16 @@ class SFLoader:
         self.basedb = basedb
 
     def insertfiledbstring(self, keys, values):
-        insert = "INSERT INTO " + self.basedb.FILEDATATABLE
-        return (
-            insert + "(" + keys.strip(", ") + ") VALUES (" + values.strip(", ") + ");"
+        ins = "INSERT INTO {} ({}) VALUES ({});".format(
+            self.basedb.FILEDATATABLE, keys.strip(", "), values.strip(", ")
         )
+        return ins
 
     def insertiddbstring(self, keys, values):
-        insert = "INSERT INTO " + self.basedb.IDTABLE
-        return (
-            insert + "(" + keys.strip(", ") + ") VALUES (" + values.strip(", ") + ");"
+        ins = "INSERT INTO {} ({}) VALUES ({});".format(
+            self.basedb.IDTABLE, keys.strip(", "), values.strip(", ")
         )
+        return ins
 
     def file_id_junction_insert(self, file, id_):
         ins = "INSERT INTO {} ({}, {}) VALUES ({}, {});".format(
@@ -95,21 +105,18 @@ class SFLoader:
             nsdict[str(header[ns])] = cursor.lastrowid
         return nsdict
 
-    # find all unique directory values in listing...
     def handledirectories(self, dirs, sf, count=False):
         newlist = []
         dirset = set(dirs)
         for d in dirset:
             newlist.append(sf.getDirName(d))
-        newlist = set(newlist)  # make newlist unique
-        dirset = list(dirset) + list(newlist)  # concatenate unique sets as lists
+        newlist = set(newlist)
+        dirset = list(dirset) + list(newlist)
         if count is False:
             return self.handledirectories(dirset, sf, len(dirset))
-        else:
-            if len(dirset) != count:
-                return self.handledirectories(dirset, sf, len(dirset))
-            else:
-                return dirset
+        if len(dirset) != count:
+            return self.handledirectories(dirset, sf, len(dirset))
+        return dirset
 
     def create_sf_database(self, sfexport, cursor):
         sf = SFYAMLHandler()
@@ -143,7 +150,7 @@ class SFLoader:
             for key, value in f.items():
                 if key in ToolMapping.SF_FILE_MAP:
                     filekeystring = filekeystring + ToolMapping.SF_FILE_MAP[key] + ", "
-                    if type(value) is not int:
+                    if not isinstance(value, int):
                         if not isinstance(value, str):
                             tmp = value.encode("utf-8")
                         else:
@@ -166,9 +173,9 @@ class SFLoader:
                 fileid = cursor.lastrowid
 
             insert = []
-            for x in range(len(idkey)):
+            for idx, value in enumerate(idkey):
                 insert.append(
-                    self.insertiddbstring("".join(idkey[x]), "".join(idvalue[x]))
+                    self.insertiddbstring("".join(value), "".join(idvalue[idx]))
                 )
 
             rowlist = []
@@ -182,8 +189,6 @@ class SFLoader:
             if sf.hashtype is not False:
                 self.basedb.hashtype = sf.hashtype
 
-        # final act - add directories to file table--#
-        # ---does not work well for absolute paths---#
-        # uniquedirs = self.handledirectories(dirlist, sf)
+        # Finally, add directories to the file table.
         uniquedirs = set(dirlist)
         self.addDirsToDB(uniquedirs, cursor)

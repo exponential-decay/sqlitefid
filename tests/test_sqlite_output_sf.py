@@ -191,11 +191,11 @@ def database(tmp_path):
     basedb = GenerateBaselineDB("sf_test.yaml")
 
     dir_ = tmp_path
-    droid_csv = dir_ / "sf_test.yaml"
-    droid_csv.write_text(SIEGFRIED_YAML.strip())
+    sf_yaml = dir_ / "sf_test.yaml"
+    sf_yaml.write_text(SIEGFRIED_YAML.strip())
 
     sf = SFYAMLHandler()
-    sf.readSFYAML(str(droid_csv))
+    sf.readSFYAML(str(sf_yaml))
     headers = sf.getHeaders()
 
     basedb.tooltype = "siegfried: {}".format(headers["siegfried"])
