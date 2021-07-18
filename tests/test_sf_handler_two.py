@@ -1,19 +1,12 @@
 # -*- coding: utf-8 -*-
 
-# TODO: Come back to this...
+# TODO RENAME
 
-from __future__ import absolute_import
-
-import collections
-import io
 import sys
 
 import pytest
 
-from sqlitefid.libs import PyDateHandler, SFHandlerClass
-from sqlitefid.libs.GenerateBaselineDBClass import GenerateBaselineDB
 from sqlitefid.libs.SFHandlerClass import SFYAMLHandler
-from sqlitefid.libs.SFLoaderClass import SFLoader
 
 SIEGFRIED_YAML = u"""---
 siegfried   : 1.9.1
@@ -135,7 +128,7 @@ matches  :
     basis   : 'extension match pdf; byte match at 0, 4'
     warning :
 ---
-filename : 'Q42591.mp3'
+filename : 'Q🖤42591XX.mp3'
 filesize : 3
 modified : 2021-07-08T23:21:40+02:00
 errors   :
@@ -175,67 +168,29 @@ else:
     PY3 = False
 
 
-def _StringIO():
-    if PY3 is True:
-        return io.StringIO()
-    return io.BytesIO()
-
-
-FIDDatabase = collections.namedtuple("FIDDatabase", "baseline cursor")
-
-
-@pytest.fixture(scope="function")
-def database(tmp_path):
-    """Create a baseline database for each of the tests below.
-
-    :returns: Yielded named tuple containing a baseline db object
-        (GenerateBaselineDB) and database cursor object (sqlite3.Cursor)
-    """
-    basedb = GenerateBaselineDB("sf_test.yaml")
+def test_read_sf_yaml(tmp_path):
 
     dir_ = tmp_path
-    droid_csv = dir_ / "sf_test.yaml"
-    droid_csv.write_text(SIEGFRIED_YAML.strip())
+    sf_yaml = dir_ / "sf_test.yaml"
+    sf_yaml.write_text(SIEGFRIED_YAML.strip())
 
     sf = SFYAMLHandler()
-    sf.readSFYAML(str(droid_csv))
-    headers = sf.getHeaders()
+    a = sf.readSFYAML(str(sf_yaml))
 
-    basedb.tooltype = "siegfried: {}".format(headers["siegfried"])
-    basedb.dbname = "file::memory:?cache=shared"
+    # print(a)
+    # print(sf.sfdata)
+    # print(sf.PROCESSING_ERROR)
+    # assert sf.sectioncount == 5
+    paths = [u"{}".format(f["filename"]) for f in sf.files]
 
-    connection = FIDDatabase(basedb, basedb.dbsetup())
+    print(paths)
 
-    yield connection
+    # print(len(paths))
+    # print(set(paths))
 
+    # if PY3:
+    # assert set(paths) == {'Q10287816.gz', 'Q42591🖤.mp3', 'Q42332.pdf', 'Q28205479.info'}
+    # else:
+    # 	assert set(paths) == {u'Q42591\U0001f5a4.mp3', u'Q42332.pdf', u'Q28205479.info', u'Q10287816.gz', u'Q42591.mp3'}
 
-def test_create_db_md(database, tmp_path):
-    basedb = database.baseline
-    cursor = database.cursor
-    dir_ = tmp_path
-    droid_csv = dir_ / "sf_test.yaml"
-    droid_csv.write_text(SIEGFRIED_YAML.strip())
-    basedb.timestamp = "timestamp_value"
-    basedb.createDBMD(cursor)
-    res = cursor.execute("select * from DBMD").fetchall()
-    # assert res == [('timestamp_value', 'False', 'siegfried: 1.9.1')]
-
-
-def test_sf_handler(database, tmp_path):
-    """Ensure that SF data is written to sqlite as expected."""
-
-    basedb = database.baseline
-    cursor = database.cursor
-
-    dir_ = tmp_path
-    droid_csv = dir_ / "sf_test.yaml"
-    droid_csv.write_text(SIEGFRIED_YAML.strip())
-
-    sfloader = SFLoader(basedb)
-    # sfloader.create_sf_database(str(droid_csv), cursor)
-
-    # res = cursor.execute("select * from DBMD").fetchall()
-
-    # print(res)
-
-    # assert False
+    assert False
