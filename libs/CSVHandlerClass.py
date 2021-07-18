@@ -20,7 +20,6 @@ except ImportError:
 
 import logging
 import os.path
-import sys
 
 if __name__.startswith("sqlitefid"):
     from sqlitefid.libs import unicodecsv
@@ -44,7 +43,8 @@ class GenericCSVHandler:
     def __init__(self, BOM=False):
         self.BOM = BOM
 
-    def __getCSVheaders__(self, header_row):
+    @staticmethod
+    def __getCSVheaders__(header_row):
         """Retrieve CSV headers from first row."""
         header_list = []
         for header in header_row:
@@ -157,8 +157,8 @@ class GenericCSVHandler:
                                     while count > 0:
                                         mfields = multi_fields
                                         mdict = {}
-                                        for i, t in enumerate(mfields):
-                                            mdict[t] = '"{}"'.format(format_list[i])
+                                        for idx, t in enumerate(mfields):
+                                            mdict[t] = '"{}"'.format(format_list[idx])
                                         format_list = format_list[len(mfields) :]
                                         multilist.append(mdict)
                                         count -= 1
@@ -187,18 +187,20 @@ class GenericCSVHandler:
 
         return csvlist
 
-    def checkline(self, line, lineno):
+    @staticmethod
+    def checkline(line, lineno):
         if "\x00" in line:
-            sys.stderr.write(
-                "CSV line {} contains null byte '\\x00'. Replacing with an empty string.\n".format(
-                    str(lineno + 1)
-                )
+            logging.error(
+                "CSV line %s contains null byte '\\x00'. Replacing with an empty string.\n",
+                (lineno + 1),
             )
             line = line.replace("\x00", "")
         return line
 
 
 class DroidCSVHandler:
+    """DroidCSVHandler."""
+
     def __init__(self):
         # date handler class
         self.pydate = PyDateHandler()
@@ -211,7 +213,8 @@ class DroidCSVHandler:
         self.csv = csvhandler.csvaslist_DROID(droidcsvfname)
         return self.csv
 
-    def getDirName(self, filepath):
+    @staticmethod
+    def getDirName(filepath):
         return os.path.dirname(filepath)
 
     def adddirname(self, droid_list):
@@ -240,7 +243,8 @@ class DroidCSVHandler:
                 new_list.append(row)
         return new_list
 
-    def removefolders(self, droid_list):
+    @staticmethod
+    def removefolders(droid_list):
         """Remove folders from existing DROID list.
 
         :param droid_list: DROID export as CSV (list)
@@ -252,7 +256,8 @@ class DroidCSVHandler:
                 new_list.append(row)
         return new_list
 
-    def retrievefolderlist(self, droid_list):
+    @staticmethod
+    def retrievefolderlist(droid_list):
         """Return a list of folder file paths from a DROID list.
 
         :param droidlist: DROID export as CSV (list)
@@ -264,7 +269,8 @@ class DroidCSVHandler:
                 new_list.append(row["FILE_PATH"])
         return new_list
 
-    def retrievefoldernames(self, droid_list):
+    @staticmethod
+    def retrievefoldernames(droid_list):
         """Return a list of folder names from a DROID list.
 
         :param droidlist: DROID export as CSV (list)

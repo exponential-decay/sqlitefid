@@ -41,9 +41,9 @@ def identifyinput(export):
     elif type_ == id_.FIDOTYPE:
         return handleFIDOCSV(export)
     elif type_ == id_.SFCSVTYPE:
-        sys.stderr.write("Siegfried CSV. Not currently handled.")
+        logging.info("Siegfried CSV. Not currently handled")
     elif type_ == id_.UNKTYPE:
-        sys.stderr.write("Unknown export type.")
+        logging.info("Unknown export type")
         return None
 
 

@@ -11,7 +11,7 @@ into the sqlite db.
 
 from __future__ import absolute_import
 
-import sys
+import logging
 
 if __name__.startswith("sqlitefid"):
     from sqlitefid.libs.SFHandlerClass import SFYAMLHandler
@@ -79,7 +79,9 @@ class SFLoader:
                 idkeystring = idkeystring + self.basedb.NSID
                 idvaluestring = "{}{}".format(idvaluestring, nsdict[x])
             else:
-                sys.stderr.write("LOG: Issue with namespace dictionary table.")
+                logging.error(
+                    "Issue with namespace dictionary table, can't find: %s", x
+                )
             idk.append(idkeystring.strip(", "))
             idv.append(idvaluestring.strip(", "))
             idkeystring = ""

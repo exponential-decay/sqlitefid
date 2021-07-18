@@ -1,5 +1,14 @@
 # -*- coding: utf-8 -*-
 
+# Disable pylint warnings for CSVHandlerClass imports which are not
+# straightforward as we try and handle PY2 and PY3.
+#
+# pylint: disable=E0611,E0401
+
+"""DROIDLoaderClass is responsible for inputting the majority of the
+DROID data into the sqlite db.
+"""
+
 from __future__ import absolute_import, print_function
 
 if __name__.startswith("sqlitefid"):
@@ -11,8 +20,8 @@ else:
 
 
 class DROIDLoader:
+    """DROIDLoader."""
 
-    basedb = ""
     BOM = False
     NS_NAME = "pronom"
     NS_ID = 0
@@ -36,38 +45,27 @@ class DROIDLoader:
             insert + "(" + keys.strip(", ") + ") VALUES (" + values.strip(", ") + ");"
         )
 
-    def file_id_junction_insert(self, file, id):
-
-        # ins = "INSERT INTO {} ({}, {}) VALUES ({}, {});".format(self.basedb.ID_JUNCTION, self.basedb.FILEID, self.basedb.IDID, str(file), str(id))
-        return (
-            "INSERT INTO "
-            + self.basedb.ID_JUNCTION
-            + "("
-            + self.basedb.FILEID
-            + ","
-            + self.basedb.IDID
-            + ") VALUES ("
-            + str(file)
-            + ","
-            + str(id)
-            + ");"
+    def file_id_junction_insert(self, file, id_):
+        ins = "INSERT INTO {} ({}, {}) VALUES ({}, {});".format(
+            self.basedb.ID_JUNCTION, self.basedb.FILEID, self.basedb.IDID, file, id_
         )
+        return ins
 
     def populateIDTable(self, formats, method, status, mismatch):
         add_fields = ["METHOD", "STATUS", "NS_ID", "EXTENSION_MISMATCH"]
         add_values = [
-            '"' + method + '"',
-            '"' + status + '"',
-            '"' + str(self.NS_ID) + '"',
-            '"' + str(mismatch) + '"',
+            '"{}"'.format(method),
+            '"{}"'.format(status),
+            '"{}"'.format(self.NS_ID),
+            '"{}"'.format(mismatch),
         ]
         idvaluelist = []
         idkeylist = []
         idkeystring = ""
         idvaluestring = ""
-        for format in formats:
-            idkeystring = ", ".join(format.keys()).split(",") + add_fields
-            idvaluestring = ", ".join(format.values()).split(",") + add_values
+        for format_ in formats:
+            idkeystring = ", ".join(format_.keys()).split(",") + add_fields
+            idvaluestring = ", ".join(format_.values()).split(",") + add_values
             idvaluelist.append(idvaluestring)
             idkeylist.append(idkeystring)
         return idkeylist, idvaluelist
@@ -143,7 +141,7 @@ class DROIDLoader:
 
                 if key == "FORMAT_COUNT":
                     continue
-                if key == "MIME_TYPE" or key == "METHOD":
+                if key in ("MIME_TYPE", "METHOD"):
                     if value == "":
                         value = "None"
                 if self.basedb.hashtype is False:
