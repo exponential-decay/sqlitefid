@@ -63,11 +63,11 @@ class SFLoader:
             for key, value in idsection[x].items():
                 if key in ToolMapping.SF_ID_MAP:
                     idkeystring = idkeystring + ToolMapping.SF_ID_MAP[key] + ", "
-                    idvaluestring = idvaluestring + "'" + str(value) + "', "
+                    idvaluestring = "{}'{}', ".format(idvaluestring, value)
                 # unmapped: Basis and Warning
             if x in nsdict:
                 idkeystring = idkeystring + self.basedb.NSID
-                idvaluestring = idvaluestring + str(nsdict[x])
+                idvaluestring = "{}{}".format(idvaluestring, nsdict[x])
             else:
                 sys.stderr.write("LOG: Issue with namespace dictionary table.")
             idk.append(idkeystring.strip(", "))
@@ -86,25 +86,12 @@ class SFLoader:
         detailstext = sf.HEADDETAILS
         for h in range(count):
             no = h + 1
-            ns = nstext + str(no)
-            details = detailstext + str(no)
-
-            # NSID is integer primary key == rowid()
-            insert = (
-                "INSERT INTO "
-                + self.basedb.NAMESPACETABLE
-                + "("
-                + "NS_NAME"
-                + ", "
-                + "NS_DETAILS"
-                + ") VALUES ('"
-                + str(header[ns])
-                + "', '"
-                + str(header[details])
-                + "');"
+            ns = "{}{}".format(nstext, no)
+            details = "{}{}".format(detailstext, no)
+            ins = "INSERT INTO {} (NS_NAME, NS_DETAILS) VALUES ('{}', '{}');".format(
+                self.basedb.NAMESPACETABLE, header[ns], header[details]
             )
-
-            cursor.execute(insert)
+            cursor.execute(ins)
             nsdict[str(header[ns])] = cursor.lastrowid
         return nsdict
 
@@ -163,7 +150,7 @@ class SFLoader:
                             tmp = value
                     else:
                         tmp = value
-                    filevaluestring = filevaluestring + "'" + str(tmp) + "', "
+                    filevaluestring = "{}'{}', ".format(filevaluestring, tmp)
                 if key == sf.FIELDDIRNAME:
                     dirlist.append(value)
                 else:
