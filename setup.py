@@ -15,7 +15,7 @@ with open("src/sqlitefid/libs/Version.py") as fp:
 setup(
     name="sqlitefid",
     version=version.get("__version__"),
-    description="Library and executable for converting format identification reports to an sqlite database",
+    description="Library and executable for converting format identification reports such as DROID and Siegfried to an sqlite database",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/exponential-decay/sqlitefid",
@@ -37,7 +37,7 @@ setup(
     entry_points={"console_scripts": ["sqlitefid=sqlitefid.sqlitefid:main"]},
     project_urls={
         "Part of demystify": "https://github.com/exponential-decay/demystify",
-        "Bug Reports": "https://github.com/exponential-decay/demystify/issues",
+        "Bug Reports": "https://github.com/exponential-decay/sqlitefid/issues",
         "Source": "https://github.com/exponential-decay/sqlitefid",
     },
 )
