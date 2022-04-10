@@ -11,8 +11,8 @@ from __future__ import absolute_import
 class SqliteFIDVersion:
     """SqliteFIDVersion."""
 
-    version = "sqlitefid-2.0.1"
+    __version__ = "v2.0.3"
 
     def getVersion(self):
         """Return version to the caller."""
-        return self.version
+        return self.__version__
