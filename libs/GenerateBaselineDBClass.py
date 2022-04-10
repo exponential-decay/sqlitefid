@@ -178,6 +178,7 @@ class GenerateBaselineDB:
                 table = self.createfield(table, column, "integer")
             else:
                 table = self.createfield(table, column)
+        table = "{} FOREIGN KEY(FILE_ID) REFERENCES IDRESULTS(FILE_ID), ".format(table)
         table = table.rstrip(", ") + ")"
         self.execute_create(table)
 
@@ -192,6 +193,8 @@ class GenerateBaselineDB:
                 table = self.createfield(table, column, "boolean")
             else:
                 table = self.createfield(table, column)
+        table = "{} FOREIGN KEY(ID_ID) REFERENCES IDRESULTS(ID_ID), ".format(table)
+        table = "{} FOREIGN KEY(NS_ID) REFERENCES NSDATA(NS_ID), ".format(table)
         table = table.rstrip(", ") + ")"
         self.execute_create(table)
 
