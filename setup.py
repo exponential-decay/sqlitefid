@@ -1,14 +1,15 @@
 """Setuptools for sqlitefid"""
 
-from setuptools import setup, find_packages
 import pathlib
+
+from setuptools import find_packages, setup
 
 here = pathlib.Path(__file__).parent.resolve()
 
 long_description = (here / "README.md").read_text(encoding="utf-8")
 
 version = {}
-with open("src/sqlitefid/version.py") as fp:
+with open("src/sqlitefid/libs/Version.py") as fp:
     exec(fp.read(), version)
 
 setup(
@@ -33,11 +34,7 @@ setup(
     package_dir={"": "src"},
     packages=find_packages(where="src"),
     python_requires=">=3.9, <4",
-    entry_points={
-        "console_scripts": [
-            "sqlitefid=sqlitefid.sqlitefid:main",
-        ],
-    },
+    entry_points={"console_scripts": ["sqlitefid=sqlitefid.sqlitefid:main"]},
     project_urls={
         "Part of demystify": "https://github.com/exponential-decay/demystify",
         "Bug Reports": "https://github.com/exponential-decay/demystify/issues",

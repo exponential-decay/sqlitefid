@@ -19,7 +19,10 @@ import logging
 import tempfile
 
 if __name__.startswith("sqlitefid"):
-    from sqlitefid.src.libs.CSVHandlerClass import GenericCSVHandler
+    try:
+        from src.sqlitefid.libs.CSVHandlerClass import GenericCSVHandler
+    except ModuleNotFoundError:
+        from sqlitefid.libs.CSVHandlerClass import GenericCSVHandler
 else:
     from libs.CSVHandlerClass import GenericCSVHandler
 

@@ -20,7 +20,10 @@ import ntpath
 import os.path
 
 if __name__.startswith("sqlitefid"):
-    from sqlitefid.src.libs.PyDateHandler import PyDateHandler
+    try:
+        from sqlitefid.src.sqlitefid.libs.PyDateHandler import PyDateHandler
+    except ModuleNotFoundError:
+        from sqlitefid.libs.PyDateHandler import PyDateHandler
 else:
     from libs.PyDateHandler import PyDateHandler
 

@@ -4,7 +4,7 @@ from __future__ import absolute_import
 
 import sys
 
-from sqlitefid.src.libs.SFHandlerClass import IDResult, SFYAMLHandler
+from sqlitefid.src.sqlitefid.libs.SFHandlerClass import IDResult, SFYAMLHandler
 
 SIEGFRIED_YAML = u"""---
 siegfried   : 1.9.1

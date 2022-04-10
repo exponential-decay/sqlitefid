@@ -22,8 +22,12 @@ import logging
 import os.path
 
 if __name__.startswith("sqlitefid"):
-    from sqlitefid.src.libs import unicodecsv
-    from sqlitefid.src.libs.PyDateHandler import PyDateHandler
+    try:
+        from sqlitefid.src.sqlitefid.libs import unicodecsv
+        from sqlitefid.src.sqlitefid.libs.PyDateHandler import PyDateHandler
+    except ModuleNotFoundError:
+        from sqlitefid.libs import unicodecsv
+        from sqlitefid.libs.PyDateHandler import PyDateHandler
 else:
     from libs import unicodecsv
     from libs.PyDateHandler import PyDateHandler

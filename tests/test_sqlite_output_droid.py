@@ -7,8 +7,8 @@ import sys
 
 import pytest
 
-from sqlitefid.src.libs.DROIDLoaderClass import DROIDLoader
-from sqlitefid.src.libs.GenerateBaselineDBClass import GenerateBaselineDB
+from sqlitefid.src.sqlitefid.libs.DROIDLoaderClass import DROIDLoader
+from sqlitefid.src.sqlitefid.libs.GenerateBaselineDBClass import GenerateBaselineDB
 
 PY3 = bool(sys.version_info[0] == 3)
 

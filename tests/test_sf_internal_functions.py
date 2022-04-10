@@ -4,7 +4,7 @@ from __future__ import absolute_import
 
 import pytest
 
-from sqlitefid.src.libs import PyDateHandler, SFHandlerClass
+from sqlitefid.src.sqlitefid.libs import PyDateHandler, SFHandlerClass
 
 
 @pytest.mark.parametrize(

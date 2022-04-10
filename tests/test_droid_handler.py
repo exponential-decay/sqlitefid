@@ -5,7 +5,7 @@ from __future__ import absolute_import
 import io
 import sys
 
-from sqlitefid.src.libs.CSVHandlerClass import GenericCSVHandler
+from sqlitefid.src.sqlitefid.libs.CSVHandlerClass import GenericCSVHandler
 
 DROID_CSV = """"ID","PARENT_ID","URI","FILE_PATH","NAME","METHOD","STATUS","SIZE","TYPE","EXT","LAST_MODIFIED","EXTENSION_MISMATCH","SHA1_HASH","FORMAT_COUNT","PUID","MIME_TYPE","FORMAT_NAME","FORMAT_VERSION"
 "2","0","file:////10.1.4.222/gda/archives-sample-files/opf-format-corpus/format-corpus/","\\10.1.4.222\\gda\archives-sample-files\\opf-format-corpus\format-corpus","🖤format-corpus",,"Done","","Folder",,"2014-02-28T15:49:11","false",,"",,"","",""

@@ -12,8 +12,12 @@ DROID data into the sqlite db.
 from __future__ import absolute_import, print_function
 
 if __name__.startswith("sqlitefid"):
-    from sqlitefid.src.libs.CSVHandlerClass import DroidCSVHandler
-    from sqlitefid.src.libs.ToolMappingClass import ToolMapping
+    try:
+        from sqlitefid.src.sqlitefid.libs.CSVHandlerClass import DroidCSVHandler
+        from sqlitefid.src.sqlitefid.libs.ToolMappingClass import ToolMapping
+    except ModuleNotFoundError:
+        from sqlitefid.libs.CSVHandlerClass import DroidCSVHandler
+        from sqlitefid.libs.ToolMappingClass import ToolMapping
 else:
     from libs.CSVHandlerClass import DroidCSVHandler
     from libs.ToolMappingClass import ToolMapping
