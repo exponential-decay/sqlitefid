@@ -24,7 +24,7 @@ def database():
     """
     basedb = GenerateBaselineDB("export.csv", in_memory=True)
     basedb.tooltype = "droid"
-    connection = FIDDatabase(basedb, basedb.dbsetup(in_memory=True))
+    connection = FIDDatabase(basedb, basedb.dbsetup())
     yield connection
 
 

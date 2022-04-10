@@ -428,7 +428,7 @@ def database(tmp_path):
     headers = sf.get_headers()
 
     basedb.tooltype = "siegfried: {}".format(headers["siegfried"])
-    connection = FIDDatabase(basedb, basedb.dbsetup(in_memory=True))
+    connection = FIDDatabase(basedb, basedb.dbsetup())
 
     yield connection
 

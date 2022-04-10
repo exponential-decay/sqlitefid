@@ -66,21 +66,21 @@ class GenerateBaselineDB:
     NS_TABLE = [NSID, "NS_NAME", "NS_DETAILS"]
 
     def __init__(self, export, debug=False, in_memory=False):
-        self.dbname = None
         self.timestamp = None
         self.cursor = None
         self.hashtype = None
         self.tooltype = None
         self.log = debug
-        self.dbname = self.getDBFilename(export)
-        self.dbsetup(in_memory)
-
-    def dbsetup(self, in_memory=False):
-        self.timestamp = self.gettimestamp()
         if in_memory:
-            self.conn = sqlite3.connect("file::memory:?cache=shared")
+            self.dbname = "file::memory:?cache=shared"
         else:
-            self.conn = sqlite3.connect(self.dbname)
+            # For compatibility non-memory databases require this.
+            self.dbname = self.getDBFilename(export)
+            self.dbsetup()
+
+    def dbsetup(self):
+        self.timestamp = self.gettimestamp()
+        self.conn = sqlite3.connect(self.dbname)
         self.cursor = self.conn.cursor()
         self.droptables(self.cursor)
 
