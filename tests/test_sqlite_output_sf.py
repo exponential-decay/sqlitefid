@@ -8,9 +8,9 @@ import sys
 
 import pytest
 
-from sqlitefid.libs.GenerateBaselineDBClass import GenerateBaselineDB
-from sqlitefid.libs.SFHandlerClass import SFYAMLHandler
-from sqlitefid.libs.SFLoaderClass import SFLoader
+from sqlitefid.src.libs.GenerateBaselineDBClass import GenerateBaselineDB
+from sqlitefid.src.libs.SFHandlerClass import SFYAMLHandler
+from sqlitefid.src.libs.SFLoaderClass import SFLoader
 
 SIEGFRIED_YAML = u"""---
 siegfried   : 1.9.1

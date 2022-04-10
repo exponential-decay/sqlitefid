@@ -12,8 +12,8 @@ into the sqlite db.
 from __future__ import absolute_import
 
 if __name__.startswith("sqlitefid"):
-    from sqlitefid.libs.SFHandlerClass import SFYAMLHandler
-    from sqlitefid.libs.ToolMappingClass import ToolMapping
+    from sqlitefid.src.libs.SFHandlerClass import SFYAMLHandler
+    from sqlitefid.src.libs.ToolMappingClass import ToolMapping
 else:
     from libs.SFHandlerClass import SFYAMLHandler
     from libs.ToolMappingClass import ToolMapping

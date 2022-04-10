@@ -22,8 +22,8 @@ import logging
 import os.path
 
 if __name__.startswith("sqlitefid"):
-    from sqlitefid.libs import unicodecsv
-    from sqlitefid.libs.PyDateHandler import PyDateHandler
+    from sqlitefid.src.libs import unicodecsv
+    from sqlitefid.src.libs.PyDateHandler import PyDateHandler
 else:
     from libs import unicodecsv
     from libs.PyDateHandler import PyDateHandler

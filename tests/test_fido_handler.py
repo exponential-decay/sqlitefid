@@ -5,7 +5,7 @@ from __future__ import absolute_import
 import io
 import sys
 
-from sqlitefid.libs.CSVHandlerClass import GenericCSVHandler
+from sqlitefid.src.libs.CSVHandlerClass import GenericCSVHandler
 
 FIDO_CSV = """"info.status","info.time","info.puid","info.formatname","info.signaturename","info.filesize","info.filename","info.mimetype","info.matchtype"
 OK,203,fmt/729,"SQLite Database File Format","SQLite Database",249856,"data/🖤opf-test-corpus-droid-analysis.db","application/x-sqlite3","signature"

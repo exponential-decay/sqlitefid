@@ -20,7 +20,7 @@ import ntpath
 import os.path
 
 if __name__.startswith("sqlitefid"):
-    from sqlitefid.libs.PyDateHandler import PyDateHandler
+    from sqlitefid.src.libs.PyDateHandler import PyDateHandler
 else:
     from libs.PyDateHandler import PyDateHandler
 

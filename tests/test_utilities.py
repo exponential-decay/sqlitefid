@@ -4,7 +4,7 @@ from __future__ import absolute_import
 
 import pytest
 
-from sqlitefid.libs.SFHandlerClass import SFYAMLHandler
+from sqlitefid.src.libs.SFHandlerClass import SFYAMLHandler
 
 path_tests = [
     # Containers.

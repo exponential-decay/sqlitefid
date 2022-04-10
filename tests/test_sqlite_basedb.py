@@ -7,7 +7,7 @@ import sys
 
 import pytest
 
-from sqlitefid.libs.GenerateBaselineDBClass import GenerateBaselineDB
+from sqlitefid.src.libs.GenerateBaselineDBClass import GenerateBaselineDB
 
 PY3 = bool(sys.version_info[0] == 3)
 
