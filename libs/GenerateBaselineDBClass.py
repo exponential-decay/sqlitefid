@@ -65,7 +65,7 @@ class GenerateBaselineDB:
     # NAMESPACE_TABLE
     NS_TABLE = [NSID, "NS_NAME", "NS_DETAILS"]
 
-    def __init__(self, export, debug=False):
+    def __init__(self, export, debug=False, in_memory=False):
         self.dbname = None
         self.timestamp = None
         self.cursor = None
@@ -73,11 +73,14 @@ class GenerateBaselineDB:
         self.tooltype = None
         self.log = debug
         self.dbname = self.getDBFilename(export)
-        self.dbsetup()
+        self.dbsetup(in_memory)
 
-    def dbsetup(self):
+    def dbsetup(self, in_memory=False):
         self.timestamp = self.gettimestamp()
-        self.conn = sqlite3.connect(self.dbname)
+        if in_memory:
+            self.conn = sqlite3.connect("file::memory:?cache=shared")
+        else:
+            self.conn = sqlite3.connect(self.dbname)
         self.cursor = self.conn.cursor()
         self.droptables(self.cursor)
 

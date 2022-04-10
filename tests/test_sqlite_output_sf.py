@@ -417,7 +417,7 @@ def database(tmp_path):
     :returns: Yielded named tuple containing a baseline db object
         (GenerateBaselineDB) and database cursor object (sqlite3.Cursor)
     """
-    basedb = GenerateBaselineDB("sf_test.yaml")
+    basedb = GenerateBaselineDB("sf_test.yaml", in_memory="True")
 
     dir_ = tmp_path
     sf_yaml = dir_ / "sf_test.yaml"
@@ -428,9 +428,7 @@ def database(tmp_path):
     headers = sf.get_headers()
 
     basedb.tooltype = "siegfried: {}".format(headers["siegfried"])
-    basedb.dbname = "file::memory:?cache=shared"
-
-    connection = FIDDatabase(basedb, basedb.dbsetup())
+    connection = FIDDatabase(basedb, basedb.dbsetup(in_memory=True))
 
     yield connection
 

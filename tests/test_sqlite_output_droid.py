@@ -23,10 +23,9 @@ def database():
     :returns: Yielded named tuple containing a baseline db object
         (GenerateBaselineDB) and database cursor object (sqlite3.Cursor)
     """
-    basedb = GenerateBaselineDB("export.csv")
+    basedb = GenerateBaselineDB("export.csv", in_memory=True)
     basedb.tooltype = "droid"
-    basedb.dbname = "file::memory:?cache=shared"
-    connection = FIDDatabase(basedb, basedb.dbsetup())
+    connection = FIDDatabase(basedb, basedb.dbsetup(in_memory=True))
     yield connection
 
 
