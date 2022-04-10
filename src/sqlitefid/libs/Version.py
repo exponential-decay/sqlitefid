@@ -7,12 +7,14 @@ Stores and returns the version of sqlitefid.
 
 from __future__ import absolute_import
 
+__version__ = "v3.0.0"
+
 
 class SqliteFIDVersion:
     """SqliteFIDVersion."""
 
-    version = "sqlitefid-2.0.1"
+    __version__ = __version__
 
     def getVersion(self):
         """Return version to the caller."""
-        return self.version
+        return self.__version__

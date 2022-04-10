@@ -19,10 +19,7 @@ import logging
 import ntpath
 import os.path
 
-if __name__.startswith("sqlitefid"):
-    from sqlitefid.libs.PyDateHandler import PyDateHandler
-else:
-    from libs.PyDateHandler import PyDateHandler
+from .PyDateHandler import PyDateHandler
 
 
 class SFYAMLHandler:
@@ -437,8 +434,7 @@ class IDResult(object):
         self.mismatch = False
 
     def add_field(self, field, value):
-        """Add value to the class if the field exists within the class.
-        """
+        """Add value to the class if the field exists within the class."""
         FIELD_BASIS = "basis"
         FIELD_WARNING = "warning"
         FIELD_MIME = "mime"

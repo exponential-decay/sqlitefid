@@ -5,7 +5,13 @@ from __future__ import absolute_import
 import io
 import sys
 
-from sqlitefid.libs.CSVHandlerClass import GenericCSVHandler
+try:
+    from sqlitefid.src.sqlitefid.libs.CSVHandlerClass import GenericCSVHandler
+except ModuleNotFoundError:
+    # Needed when imported as submodule via demystify.
+    from src.demystify.sqlitefid.src.sqlitefid.libs.CSVHandlerClass import (
+        GenericCSVHandler,
+    )
 
 FIDO_CSV = """"info.status","info.time","info.puid","info.formatname","info.signaturename","info.filesize","info.filename","info.mimetype","info.matchtype"
 OK,203,fmt/729,"SQLite Database File Format","SQLite Database",249856,"data/🖤opf-test-corpus-droid-analysis.db","application/x-sqlite3","signature"
@@ -21,18 +27,12 @@ OK,9,fmt/939,"Python Compiled File","PYC 2.7",159,"__init__.pyc","None","signatu
 PY3 = bool(sys.version_info[0] == 3)
 
 
-def _StringIO():
-    if PY3 is True:
-        return io.StringIO()
-    return io.BytesIO()
-
-
 def test_fido_handler_no_BOM():
     """Ensure that the return for a non-identified CSV is accurate. This
     is determined in the constructor.
     """
     fidocsvhandler = GenericCSVHandler(BOM=False)
-    csv_in = _StringIO()
+    csv_in = io.StringIO()
     csv_in.write(FIDO_CSV)
     res = fidocsvhandler._csv_to_list(csv_in)
     assert res == []
@@ -42,7 +42,7 @@ def test_fido_handler_no_BOM():
 def test_fido_handler_BOM():
     """Ensure that we get sensible values out of a valid CSV."""
     fidocsvhandler = GenericCSVHandler(BOM=True)
-    csv_in = _StringIO()
+    csv_in = io.StringIO()
     csv_in.write(FIDO_CSV)
     res = fidocsvhandler._csv_to_list(csv_in)
     assert len(res) == 9

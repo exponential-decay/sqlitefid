@@ -2,9 +2,14 @@
 
 from __future__ import absolute_import
 
-import sys
-
-from sqlitefid.libs.SFHandlerClass import IDResult, SFYAMLHandler
+try:
+    from sqlitefid.src.sqlitefid.libs.SFHandlerClass import IDResult, SFYAMLHandler
+except ModuleNotFoundError:
+    # Needed when imported as submodule via demystify.
+    from src.demystify.sqlitefid.src.sqlitefid.libs.SFHandlerClass import (
+        IDResult,
+        SFYAMLHandler,
+    )
 
 SIEGFRIED_YAML = u"""---
 siegfried   : 1.9.1
@@ -159,8 +164,6 @@ matches  :
     basis   :
     warning : 'no match; possibilities based on extension are fdd000052, fdd000053, fdd000105, fdd000111, fdd000256, fdd000275'
 """
-
-PY3 = bool(sys.version_info[0] == 3)
 
 
 def test_read_sf_yaml(tmp_path):

@@ -5,7 +5,14 @@ from __future__ import absolute_import
 import io
 import sys
 
-from sqlitefid.libs.CSVHandlerClass import GenericCSVHandler
+try:
+    from sqlitefid.src.sqlitefid.libs.CSVHandlerClass import GenericCSVHandler
+except ModuleNotFoundError:
+    # Needed when imported as submodule via demystify.
+    from src.demystify.sqlitefid.src.sqlitefid.libs.CSVHandlerClass import (
+        GenericCSVHandler,
+    )
+
 
 DROID_CSV = """"ID","PARENT_ID","URI","FILE_PATH","NAME","METHOD","STATUS","SIZE","TYPE","EXT","LAST_MODIFIED","EXTENSION_MISMATCH","SHA1_HASH","FORMAT_COUNT","PUID","MIME_TYPE","FORMAT_NAME","FORMAT_VERSION"
 "2","0","file:////10.1.4.222/gda/archives-sample-files/opf-format-corpus/format-corpus/","\\10.1.4.222\\gda\archives-sample-files\\opf-format-corpus\format-corpus","🖤format-corpus",,"Done","","Folder",,"2014-02-28T15:49:11","false",,"",,"","",""
@@ -27,18 +34,12 @@ DROID_CSV = """"ID","PARENT_ID","URI","FILE_PATH","NAME","METHOD","STATUS","SIZE
 PY3 = bool(sys.version_info[0] == 3)
 
 
-def _StringIO():
-    if PY3 is True:
-        return io.StringIO()
-    return io.BytesIO()
-
-
 def test_droid_handler_no_BOM():
     """Ensure that the return for a non-identified CSV is accurate. This
     is determined in the constructor.
     """
     droidcsvhandler = GenericCSVHandler(BOM=False)
-    csv_in = _StringIO()
+    csv_in = io.StringIO()
     csv_in.write(DROID_CSV)
     res = droidcsvhandler._csv_to_list(csv_in)
     assert res == []
@@ -48,7 +49,7 @@ def test_droid_handler_no_BOM():
 def test_droid_handler_BOM():
     """Ensure that we get sensible values out of a valid CSV."""
     droidcsvhandler = GenericCSVHandler(BOM=True)
-    csv_in = _StringIO()
+    csv_in = io.StringIO()
     csv_in.write(DROID_CSV)
     res = droidcsvhandler._csv_to_list(csv_in)
     assert len(res) == 14
@@ -227,7 +228,7 @@ def test_droid_handler_skeletons():
        so its count is 77 vs. DROID's 75.
     """
     droidcsvhandler = GenericCSVHandler(BOM=True)
-    csv_in = _StringIO()
+    csv_in = io.StringIO()
     csv_in.write(DROID_CSV_SKELETONS)
     res = droidcsvhandler._csv_to_list(csv_in)
 

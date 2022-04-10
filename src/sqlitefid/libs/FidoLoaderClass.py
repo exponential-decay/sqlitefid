@@ -18,10 +18,7 @@ from __future__ import absolute_import
 import logging
 import tempfile
 
-if __name__.startswith("sqlitefid"):
-    from sqlitefid.libs.CSVHandlerClass import GenericCSVHandler
-else:
-    from libs.CSVHandlerClass import GenericCSVHandler
+from .CSVHandlerClass import GenericCSVHandler
 
 
 class FidoLoader:

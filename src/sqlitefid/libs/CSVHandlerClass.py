@@ -12,21 +12,12 @@ Handles the CSV inputs for demystify.
 
 from __future__ import absolute_import
 
-# Python 2 and 3.
-try:
-    from urllib.parse import urlparse
-except ImportError:
-    from urlparse import urlparse
-
 import logging
 import os.path
+from urllib.parse import urlparse
 
-if __name__.startswith("sqlitefid"):
-    from sqlitefid.libs import unicodecsv
-    from sqlitefid.libs.PyDateHandler import PyDateHandler
-else:
-    from libs import unicodecsv
-    from libs.PyDateHandler import PyDateHandler
+from . import unicodecsv
+from .PyDateHandler import PyDateHandler
 
 
 class CSVExportException(Exception):

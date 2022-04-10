@@ -3,14 +3,18 @@
 from __future__ import absolute_import
 
 import collections
-import sys
 
 import pytest
 
-from sqlitefid.libs.DROIDLoaderClass import DROIDLoader
-from sqlitefid.libs.GenerateBaselineDBClass import GenerateBaselineDB
-
-PY3 = bool(sys.version_info[0] == 3)
+try:
+    from sqlitefid.src.sqlitefid.libs.DROIDLoaderClass import DROIDLoader
+    from sqlitefid.src.sqlitefid.libs.GenerateBaselineDBClass import GenerateBaselineDB
+except ModuleNotFoundError:
+    # Needed when imported as submodule via demystify.
+    from src.demystify.sqlitefid.src.sqlitefid.libs.DROIDLoaderClass import DROIDLoader
+    from src.demystify.sqlitefid.src.sqlitefid.libs.GenerateBaselineDBClass import (
+        GenerateBaselineDB,
+    )
 
 
 FIDDatabase = collections.namedtuple("FIDDatabase", "baseline cursor")
@@ -23,9 +27,8 @@ def database():
     :returns: Yielded named tuple containing a baseline db object
         (GenerateBaselineDB) and database cursor object (sqlite3.Cursor)
     """
-    basedb = GenerateBaselineDB("export.csv")
+    basedb = GenerateBaselineDB("export.csv", in_memory=True)
     basedb.tooltype = "droid"
-    basedb.dbname = "file::memory:?cache=shared"
     connection = FIDDatabase(basedb, basedb.dbsetup())
     yield connection
 
@@ -43,10 +46,7 @@ def test_droid_setup(database):
 
     assert res[0][0] == 1
     assert res[0][1] == "pronom"
-    if PY3:
-        assert res[0][2] == "filename-♖♗♘♙♚♛♜♝♞♟.csv"
-    else:
-        assert res[0][2].encode("utf8") == "filename-♖♗♘♙♚♛♜♝♞♟.csv"
+    assert res[0][2] == "filename-♖♗♘♙♚♛♜♝♞♟.csv"
 
     assert droid_loader.NS_DETAILS == "filename-♖♗♘♙♚♛♜♝♞♟.csv"
 

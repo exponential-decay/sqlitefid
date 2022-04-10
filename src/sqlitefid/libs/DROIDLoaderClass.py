@@ -11,12 +11,11 @@ DROID data into the sqlite db.
 
 from __future__ import absolute_import, print_function
 
-if __name__.startswith("sqlitefid"):
-    from sqlitefid.libs.CSVHandlerClass import DroidCSVHandler
-    from sqlitefid.libs.ToolMappingClass import ToolMapping
-else:
-    from libs.CSVHandlerClass import DroidCSVHandler
-    from libs.ToolMappingClass import ToolMapping
+import logging
+from sqlite3 import OperationalError
+
+from .CSVHandlerClass import DroidCSVHandler
+from .ToolMappingClass import ToolMapping
 
 
 class DROIDLoader:
@@ -174,7 +173,16 @@ class DROIDLoader:
             fileidx = None
 
             if filekeystring != "" and filevaluestring != "":
-                cursor.execute(self.insertfiledbstring(filekeystring, filevaluestring))
+                ins = self.insertfiledbstring(filekeystring, filevaluestring)
+                try:
+                    cursor.execute(ins)
+                except OperationalError as err:
+                    # Output some logging to help users determine which rows
+                    # are affected by this issue. It is likely the input report
+                    # is not escaped properly, or we need to handle it better
+                    # when converting it.
+                    logging.error("Insert failed: %s insert: '%s'", err, ins[131:160])
+                    continue
                 fileidx = cursor.lastrowid
 
             if folder:

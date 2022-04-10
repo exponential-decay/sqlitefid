@@ -4,7 +4,11 @@ from __future__ import absolute_import
 
 import pytest
 
-from sqlitefid.libs.SFHandlerClass import SFYAMLHandler
+try:
+    from sqlitefid.src.sqlitefid.libs.SFLoaderClass import SFYAMLHandler
+except ModuleNotFoundError:
+    # Needed when imported as submodule via demystify.
+    from src.demystify.sqlitefid.src.sqlitefid.libs.SFHandlerClass import SFYAMLHandler
 
 path_tests = [
     # Containers.

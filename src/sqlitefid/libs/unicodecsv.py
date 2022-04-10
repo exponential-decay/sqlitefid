@@ -15,12 +15,6 @@ import csv
 #
 # pylint: skip-file
 
-try:
-    import itertools.izip as izip
-except ImportError:
-    pass
-
-
 # https://pypi.python.org/pypi/unicodecsv
 # http://semver.org/
 VERSION = (0, 9, 4)
@@ -137,11 +131,7 @@ class UnicodeReader(object):
         return self.next()
 
     def next(self):
-        # PY3 compatibility.
-        try:
-            row = self.reader.next()
-        except AttributeError:
-            row = self.reader.__next__()
+        row = self.reader.__next__()
         encoding = self.encoding
         encoding_errors = self.encoding_errors
         float_ = float

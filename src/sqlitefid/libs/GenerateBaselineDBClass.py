@@ -65,15 +65,18 @@ class GenerateBaselineDB:
     # NAMESPACE_TABLE
     NS_TABLE = [NSID, "NS_NAME", "NS_DETAILS"]
 
-    def __init__(self, export, debug=False):
-        self.dbname = None
+    def __init__(self, export, debug=False, in_memory=False):
         self.timestamp = None
         self.cursor = None
         self.hashtype = None
         self.tooltype = None
         self.log = debug
-        self.dbname = self.getDBFilename(export)
-        self.dbsetup()
+        if in_memory:
+            self.dbname = "file::memory:?cache=shared"
+        else:
+            # For compatibility non-memory databases require this.
+            self.dbname = self.getDBFilename(export)
+            self.dbsetup()
 
     def dbsetup(self):
         self.timestamp = self.gettimestamp()

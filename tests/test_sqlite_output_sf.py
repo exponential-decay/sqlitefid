@@ -3,14 +3,20 @@
 from __future__ import absolute_import
 
 import collections
-import io
-import sys
 
 import pytest
 
-from sqlitefid.libs.GenerateBaselineDBClass import GenerateBaselineDB
-from sqlitefid.libs.SFHandlerClass import SFYAMLHandler
-from sqlitefid.libs.SFLoaderClass import SFLoader
+try:
+    from sqlitefid.src.sqlitefid.libs.GenerateBaselineDBClass import GenerateBaselineDB
+    from sqlitefid.src.sqlitefid.libs.SFHandlerClass import SFYAMLHandler
+    from sqlitefid.src.sqlitefid.libs.SFLoaderClass import SFLoader
+except ModuleNotFoundError:
+    # Needed when imported as submodule via demystify.
+    from src.demystify.sqlitefid.src.sqlitefid.libs.GenerateBaselineDBClass import (
+        GenerateBaselineDB,
+    )
+    from src.demystify.sqlitefid.src.sqlitefid.libs.SFHandlerClass import SFYAMLHandler
+    from src.demystify.sqlitefid.src.sqlitefid.libs.SFLoaderClass import SFLoader
 
 SIEGFRIED_YAML = u"""---
 siegfried   : 1.9.1
@@ -398,15 +404,6 @@ matches  :
 """
 
 
-PY3 = bool(sys.version_info[0] == 3)
-
-
-def _StringIO():
-    if PY3 is True:
-        return io.StringIO()
-    return io.BytesIO()
-
-
 FIDDatabase = collections.namedtuple("FIDDatabase", "baseline cursor")
 
 
@@ -417,7 +414,7 @@ def database(tmp_path):
     :returns: Yielded named tuple containing a baseline db object
         (GenerateBaselineDB) and database cursor object (sqlite3.Cursor)
     """
-    basedb = GenerateBaselineDB("sf_test.yaml")
+    basedb = GenerateBaselineDB("sf_test.yaml", in_memory="True")
 
     dir_ = tmp_path
     sf_yaml = dir_ / "sf_test.yaml"
@@ -428,8 +425,6 @@ def database(tmp_path):
     headers = sf.get_headers()
 
     basedb.tooltype = "siegfried: {}".format(headers["siegfried"])
-    basedb.dbname = "file::memory:?cache=shared"
-
     connection = FIDDatabase(basedb, basedb.dbsetup())
 
     yield connection
@@ -4147,10 +4142,10 @@ matches  :
 
 def test_multi_ids(database, tmp_path):
     """Test that multiple identifications are picked up from a Siegfried
-  analysis. These are a risk an identification will not work as
-  anticipated, as well as indicating potential problems down the line,
-  e.g. systems anticipating a single-identification.
-  """
+    analysis. These are a risk an identification will not work as
+    anticipated, as well as indicating potential problems down the line,
+    e.g. systems anticipating a single-identification.
+    """
     basedb = database.baseline
     cursor = database.cursor
     dir_ = tmp_path
