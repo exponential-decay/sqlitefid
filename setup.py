@@ -31,7 +31,6 @@ setup(
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.9",
-        "Programming Language :: Python :: 3.11",
     ],
     keywords="digital-preservation, file-analysis, format-identification",
     package_dir={"": "src"},
