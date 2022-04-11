@@ -15,7 +15,7 @@ jobs:
           - python-version: "3.5"
             toxenv: "py35"
           - python-version: "3.9"
-            toxenv: "py39""
+            toxenv: "py39"
     steps:
       - name: "Check out repository"
         uses: "actions/checkout@v2"
