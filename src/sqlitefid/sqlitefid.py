@@ -42,12 +42,13 @@ else:
         from sqlitefid.src.sqlitefid.libs.SFLoaderClass import SFLoader
         from sqlitefid.src.sqlitefid.libs.Version import SqliteFIDVersion
     except ModuleNotFoundError:
-        from sqlitefid.libs.DROIDLoaderClass import DROIDLoader
-        from sqlitefid.libs.FidoLoaderClass import FidoLoader
-        from sqlitefid.libs.GenerateBaselineDBClass import GenerateBaselineDB
-        from sqlitefid.libs.IdentifyExportClass import IdentifyExport
-        from sqlitefid.libs.SFLoaderClass import SFLoader
-        from sqlitefid.libs.Version import SqliteFIDVersion
+        # Required imports for main from root.
+        from .libs.DROIDLoaderClass import DROIDLoader
+        from .libs.FidoLoaderClass import FidoLoader
+        from .libs.GenerateBaselineDBClass import GenerateBaselineDB
+        from .libs.IdentifyExportClass import IdentifyExport
+        from .libs.SFLoaderClass import SFLoader
+        from .libs.Version import SqliteFIDVersion
 
 args = None
 

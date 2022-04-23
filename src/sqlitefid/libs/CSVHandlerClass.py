@@ -29,8 +29,9 @@ if __name__.startswith("sqlitefid"):
         from sqlitefid.libs import unicodecsv
         from sqlitefid.libs.PyDateHandler import PyDateHandler
 else:
-    from libs import unicodecsv
-    from libs.PyDateHandler import PyDateHandler
+    # Required imports for main from root.
+    from . import unicodecsv
+    from .PyDateHandler import PyDateHandler
 
 
 class CSVExportException(Exception):

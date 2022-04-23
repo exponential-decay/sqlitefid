@@ -4145,10 +4145,10 @@ matches  :
 
 def test_multi_ids(database, tmp_path):
     """Test that multiple identifications are picked up from a Siegfried
-  analysis. These are a risk an identification will not work as
-  anticipated, as well as indicating potential problems down the line,
-  e.g. systems anticipating a single-identification.
-  """
+    analysis. These are a risk an identification will not work as
+    anticipated, as well as indicating potential problems down the line,
+    e.g. systems anticipating a single-identification.
+    """
     basedb = database.baseline
     cursor = database.cursor
     dir_ = tmp_path

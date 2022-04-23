@@ -24,7 +24,8 @@ if __name__.startswith("sqlitefid"):
     except ModuleNotFoundError:
         from sqlitefid.libs.CSVHandlerClass import GenericCSVHandler
 else:
-    from libs.CSVHandlerClass import GenericCSVHandler
+    # Required imports for main from root.
+    from .CSVHandlerClass import GenericCSVHandler
 
 
 class FidoLoader:

@@ -19,8 +19,9 @@ if __name__.startswith("sqlitefid"):
         from sqlitefid.libs.SFHandlerClass import SFYAMLHandler
         from sqlitefid.libs.ToolMappingClass import ToolMapping
 else:
-    from libs.SFHandlerClass import SFYAMLHandler
-    from libs.ToolMappingClass import ToolMapping
+    # Required imports for main from root.
+    from .SFHandlerClass import SFYAMLHandler
+    from .ToolMappingClass import ToolMapping
 
 
 class SFLoader:

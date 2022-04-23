@@ -19,8 +19,13 @@ if __name__.startswith("sqlitefid"):
         from sqlitefid.libs.CSVHandlerClass import DroidCSVHandler
         from sqlitefid.libs.ToolMappingClass import ToolMapping
 else:
-    from libs.CSVHandlerClass import DroidCSVHandler
-    from libs.ToolMappingClass import ToolMapping
+    try:
+        from libs.CSVHandlerClass import DroidCSVHandler
+        from libs.ToolMappingClass import ToolMapping
+    except ModuleNotFoundError:
+        # Required imports for main from root.
+        from .CSVHandlerClass import DroidCSVHandler
+        from .ToolMappingClass import ToolMapping
 
 
 class DROIDLoader:
