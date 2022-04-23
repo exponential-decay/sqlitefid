@@ -22,7 +22,8 @@ if __name__.startswith("sqlitefid"):
     try:
         from src.sqlitefid.libs.CSVHandlerClass import GenericCSVHandler
     except ModuleNotFoundError:
-        from sqlitefid.libs.CSVHandlerClass import GenericCSVHandler
+        # Required for demystify import.
+        from .CSVHandlerClass import GenericCSVHandler
 else:
     # Required imports for main from root.
     from .CSVHandlerClass import GenericCSVHandler
