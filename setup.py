@@ -41,5 +41,6 @@ setup(
         "Part of demystify": "https://github.com/exponential-decay/demystify",
         "Bug Reports": "https://github.com/exponential-decay/sqlitefid/issues",
         "Source": "https://github.com/exponential-decay/sqlitefid",
+        "Ko-Fi": "https://ko-fi.com/beet_keeper",
     },
 )
