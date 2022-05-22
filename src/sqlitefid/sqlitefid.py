@@ -34,7 +34,7 @@ logging.basicConfig(format=LOGFORMAT, datefmt=DATEFORMAT, level="INFO")
 args = None
 
 
-def identify_and_process_input(report_path):
+def identify_and_process_input(report_path, in_memory=False):
     """Identify an input from a given path and process the results if
     there is support.
 
@@ -45,11 +45,11 @@ def identify_and_process_input(report_path):
     id_ = IdentifyExport()
     type_ = id_.exportid(export)
     if type_ == id_.DROIDTYPE:
-        return handleDROIDCSV(export)
+        return handleDROIDCSV(export, in_memory=in_memory)
     if type_ == id_.DROIDTYPEBOM:
-        return handleDROIDCSV(export, True)
+        return handleDROIDCSV(export, BOM=True, in_memory=in_memory)
     if type_ == id_.SFTYPE:
-        return handleSFYAML(export)
+        return handleSFYAML(export, in_memory=in_memory)
     if type_ == id_.FIDOTYPE:
         return handleFIDOCSV(export)
     if type_ == id_.SFCSVTYPE:
@@ -60,31 +60,30 @@ def identify_and_process_input(report_path):
         return None
 
 
-def handleDROIDCSV(droidcsv, BOM=False):
+def handleDROIDCSV(droidcsv, BOM=False, in_memory=False):
     debug = False
     try:
         debug = args.debug
     except AttributeError:
         pass
-    basedb = GenerateBaselineDB(droidcsv, debug)
-
+    basedb = GenerateBaselineDB(droidcsv, debug, in_memory=in_memory)
     loader = DROIDLoader(basedb, BOM, debug=debug)
     loader.create_droid_database(droidcsv, basedb.getcursor())
-    basedb.closedb()
-    return basedb.dbname
+    basedb.createDBMD()
+    return basedb.conn
 
 
-def handleSFYAML(sfexport):
+def handleSFYAML(sfexport, in_memory=False):
     debug = False
     try:
         debug = args.debug
     except AttributeError:
         pass
-    basedb = GenerateBaselineDB(sfexport, debug)
+    basedb = GenerateBaselineDB(sfexport, debug, in_memory=in_memory)
     loader = SFLoader(basedb)
     loader.create_sf_database(sfexport, basedb.getcursor())
-    basedb.closedb()
-    return basedb.dbname
+    basedb.createDBMD()
+    return basedb.conn
 
 
 def handleFIDOCSV(fidoexport):

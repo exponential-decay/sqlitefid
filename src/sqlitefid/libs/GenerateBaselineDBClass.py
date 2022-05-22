@@ -73,6 +73,7 @@ class GenerateBaselineDB:
         self.log = debug
         if in_memory:
             self.dbname = ":memory:"
+            self.dbsetup()
         else:
             # For compatibility non-memory databases require this.
             self.dbname = self.getDBFilename(export)
@@ -83,7 +84,6 @@ class GenerateBaselineDB:
         self.conn = sqlite3.connect(self.dbname)
         self.cursor = self.conn.cursor()
         self.droptables(self.cursor)
-
         # create a table to hold information about the file only
         self.createfiledatatable()
         self.createidtable()
