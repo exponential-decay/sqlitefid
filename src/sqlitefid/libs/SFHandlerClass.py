@@ -249,10 +249,13 @@ class SFYAMLHandler:
 
         return filedict
 
-    def _process_sf(self, sf, filedata, processed):
+    def _process_sf(self, sf_report, filedata, processed):
         """Process a Siegfried file and return the results."""
-        for line in sf:
+        for line in sf_report:
             line = line.strip()
+            # Guard for incorrectly formatted filenames/YAML.
+            if not line.endswith("'") and line.startswith("filename"):
+                line = f"{line}{next(sf_report).strip()}"
             if line == self.YAMLSECTION:
                 self.sectioncount += 1
                 processed = False

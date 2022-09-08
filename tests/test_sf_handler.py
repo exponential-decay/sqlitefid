@@ -3074,3 +3074,106 @@ def test_read_sf_yaml_skeletons(tmp_path):
     id_3.warning = "match on extension only"
     id_3.mismatch = False
     id_3.status = None
+
+
+BAD_YAML = """---
+filename : 'Mac RF Test.zip#Mac RF Test\\ProTools AppleSingle\\Demo Session\\Audio Files\\Icon
+'
+filesize : 0
+modified : 1996-11-14T13:29:32Z
+errors   : 'empty source'
+matches  :
+  - ns      : 'pronom'
+    id      : 'UNKNOWN'
+    format  :
+    version :
+    mime    :
+    basis   :
+    warning : 'no match'
+---
+filename : 'Mac RF Test.zip#__MACOSX\\Mac RF Test\\ProTools AppleSingle\\Demo Session\\Audio Files\\._Icon
+'
+filesize : 2790
+modified : 1996-11-14T13:29:32Z
+errors   :
+matches  :
+  - ns      : 'pronom'
+    id      : 'fmt/503'
+    format  : 'AppleDouble Resource Fork'
+    version : '2'
+    mime    : 'multipart/appledouble'
+    basis   : 'byte match at 0, 8'
+    warning :
+---
+filename : 'Mac RF Test.zip#Mac RF Test\\ProTools AppleSingle\\Demo Session\\Audio Files\\Icon
+.as1'
+filesize : 2829
+modified : 2022-03-03T10:20:10Z
+errors   :
+matches  :
+  - ns      : 'pronom'
+    id      : 'fmt/968'
+    format  : 'AppleSingle'
+    version : '2'
+    mime    : 'application/applefile'
+    basis   : 'byte match at 0, 8'
+    warning :
+---
+filename : 'Mac RF Test.zip#Mac RF Test\\ProTools AppleSingle\\Demo Session\\Audio Files\\Icon
+   .as2'
+filesize : 2829
+modified : 2022-03-03T10:20:10Z
+errors   :
+matches  :
+  - ns      : 'pronom'
+    id      : 'fmt/968'
+    format  : 'AppleSingle'
+    version : '2'
+    mime    : 'application/applefile'
+    basis   : 'byte match at 0, 8'
+    warning :
+---
+filename : 'Mac RF Test.zip#Mac RF Test\\ProTools AppleSingle\\Demo Session\\Audio Files\\Icon
+\t\t.as3'
+filesize : 2829
+modified : 2022-03-03T10:20:10Z
+errors   :
+matches  :
+  - ns      : 'pronom'
+    id      : 'fmt/968'
+    format  : 'AppleSingle'
+    version : '2'
+    mime    : 'application/applefile'
+    basis   : 'byte match at 0, 8'
+    warning :
+---
+"""
+
+
+def test_bad_yaml(tmp_path):
+    """YAML may end up being output on multiple lines incorrectly. This
+    output may be formatted with an indent, or not. Ensure that the
+    output is predictable either way.
+    """
+    dir_ = tmp_path
+    sf_yaml = dir_ / "sf_test.yaml"
+    sf_yaml.write_text(BAD_YAML.strip(), encoding="UTF-8")
+
+    sf = SFYAMLHandler()
+    sf.read_sf_yaml(str(sf_yaml))
+
+    # Access files in processed data to verify integrity.
+    files = sf.sfdata["files"]
+
+    assert len(files) == 4
+    expected = [
+        "Mac RF Test.zip#__MACOSX\\Mac RF Test\\ProTools AppleSingle\\Demo Session\\Audio Files\\._Icon",
+        "Mac RF Test.zip#Mac RF Test\\ProTools AppleSingle\\Demo Session\\Audio Files\\Icon.as1",
+        "Mac RF Test.zip#Mac RF Test\\ProTools AppleSingle\\Demo Session\\Audio Files\\Icon.as2",
+        "Mac RF Test.zip#Mac RF Test\\ProTools AppleSingle\\Demo Session\\Audio Files\\Icon.as3",
+    ]
+    gathered = []
+    for file in files:
+        assert file.get("filename", False)
+        gathered.append(file.get("filename", False))
+    assert gathered == expected
