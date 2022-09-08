@@ -11,7 +11,7 @@ except ModuleNotFoundError:
         SFYAMLHandler,
     )
 
-SIEGFRIED_YAML = u"""---
+SIEGFRIED_YAML = """---
 siegfried   : 1.9.1
 scandate    : 2021-07-17T22:11:59+02:00
 signature   : default.sig
@@ -173,17 +173,17 @@ def test_read_sf_yaml(tmp_path):
 
     dir_ = tmp_path
     sf_yaml = dir_ / "sf_test.yaml"
-    sf_yaml.write_text(SIEGFRIED_YAML.strip())
+    sf_yaml.write_text(SIEGFRIED_YAML.strip(), encoding="UTF-8")
 
     sf = SFYAMLHandler()
     sf.read_sf_yaml(str(sf_yaml))
 
     assert sf.sectioncount == 5
-    paths = [u"{}".format(f["filename"]) for f in sf.files]
+    paths = ["{}".format(f["filename"]) for f in sf.files]
 
     res = list(set(paths))
 
-    expected = ["Q10287816.gz", "Q28205479.info", "Q42332.pdf", u"Q42591🖤.mp3"]
+    expected = ["Q10287816.gz", "Q28205479.info", "Q42332.pdf", "Q42591🖤.mp3"]
 
     res.sort()
     expected.sort()
@@ -301,7 +301,7 @@ def test_read_sf_yaml(tmp_path):
     assert sf.filecount == 4
 
 
-SIEGFRIED_YAML_SKELETONS = u"""---
+SIEGFRIED_YAML_SKELETONS = """---
 siegfried   : 1.9.1
 scandate    : 2021-07-25T17:11:02+02:00
 signature   : default.sig
@@ -2892,7 +2892,7 @@ def test_read_sf_yaml_skeletons(tmp_path):
 
     dir_ = tmp_path
     sf_yaml = dir_ / "sf_test.yaml"
-    sf_yaml.write_text(SIEGFRIED_YAML_SKELETONS.strip())
+    sf_yaml.write_text(SIEGFRIED_YAML_SKELETONS.strip(), encoding="UTF-8")
 
     sf = SFYAMLHandler()
     sf.read_sf_yaml(str(sf_yaml))
@@ -3019,7 +3019,7 @@ def test_read_sf_yaml_skeletons(tmp_path):
 
     assert (
         files[2].get("filename")
-        == u"fixtures/archive-types/container-example-four.tar.gz#container-example-four.tar#dirs_with_various_encodings/cp437/año/cp437_encoded_dirs.txt"
+        == "fixtures/archive-types/container-example-four.tar.gz#container-example-four.tar#dirs_with_various_encodings/cp437/año/cp437_encoded_dirs.txt"
     )
     assert files[2].get("filesize") == "97"
     assert files[2].get("modified") == "2020-06-22T19:38:22+02:00"

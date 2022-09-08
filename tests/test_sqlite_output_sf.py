@@ -18,7 +18,7 @@ except ModuleNotFoundError:
     from src.demystify.sqlitefid.src.sqlitefid.libs.SFHandlerClass import SFYAMLHandler
     from src.demystify.sqlitefid.src.sqlitefid.libs.SFLoaderClass import SFLoader
 
-SIEGFRIED_YAML = u"""---
+SIEGFRIED_YAML = """---
 siegfried   : 1.9.1
 scandate    : 2021-07-17T22:11:59+02:00
 signature   : default.sig
@@ -418,7 +418,7 @@ def database(tmp_path):
 
     dir_ = tmp_path
     sf_yaml = dir_ / "sf_test.yaml"
-    sf_yaml.write_text(SIEGFRIED_YAML.strip())
+    sf_yaml.write_text(SIEGFRIED_YAML.strip(), encoding="UTF-8")
 
     sf = SFYAMLHandler()
     sf.read_sf_yaml(str(sf_yaml))
@@ -438,7 +438,7 @@ def test_create_db_md(database, tmp_path):
     cursor = database.cursor
     dir_ = tmp_path
     sf_yaml = dir_ / "sf_test.yaml"
-    sf_yaml.write_text(SIEGFRIED_YAML.strip())
+    sf_yaml.write_text(SIEGFRIED_YAML.strip(), encoding="UTF-8")
     sfloader = SFLoader(basedb)
     sfloader.create_sf_database(str(sf_yaml), cursor)
     basedb.timestamp = "timestamp_value"
@@ -454,7 +454,7 @@ def test_sf_handler(database, tmp_path):
     cursor = database.cursor
     dir_ = tmp_path
     sf_yaml = dir_ / "sf_test.yaml"
-    sf_yaml.write_text(SIEGFRIED_YAML.strip())
+    sf_yaml.write_text(SIEGFRIED_YAML.strip(), encoding="UTF-8")
     sfloader = SFLoader(basedb)
     sfloader.create_sf_database(str(sf_yaml), cursor)
 
@@ -465,28 +465,28 @@ def test_sf_handler(database, tmp_path):
     assert len(res) == 10
     expected = [
         (None, "", "", "", 0, "Folder"),
-        (None, u"cp437/café", u"cp437/café", u"café", 0, "Folder"),
-        (None, u"shift_jis/ぽっぷるメイル", u"shift_jis/ぽっぷるメイル", u"ぽっぷるメイル", 0, "Folder"),
+        (None, "cp437/café", "cp437/café", "café", 0, "Folder"),
+        (None, "shift_jis/ぽっぷるメイル", "shift_jis/ぽっぷるメイル", "ぽっぷるメイル", 0, "Folder"),
         (
             None,
-            u"emoji/chess-♕♖♗♘♙♚♛♜♝♞♟",
-            u"emoji/chess-♕♖♗♘♙♚♛♜♝♞♟",
-            u"chess-♕♖♗♘♙♚♛♜♝♞♟",
+            "emoji/chess-♕♖♗♘♙♚♛♜♝♞♟",
+            "emoji/chess-♕♖♗♘♙♚♛♜♝♞♟",
+            "chess-♕♖♗♘♙♚♛♜♝♞♟",
             0,
             "Folder",
         ),
         (
             None,
-            u"emoji/hearts-❤💖💙💚💛💜💝",
-            u"emoji/hearts-❤💖💙💚💛💜💝",
-            u"hearts-❤💖💙💚💛💜💝",
+            "emoji/hearts-❤💖💙💚💛💜💝",
+            "emoji/hearts-❤💖💙💚💛💜💝",
+            "hearts-❤💖💙💚💛💜💝",
             0,
             "Folder",
         ),
         (None, "test_dir/test_dir", "test_dir/test_dir", "test_dir", 0, "Folder"),
-        (None, u"windows_1252/søster", u"windows_1252/søster", u"søster", 0, "Folder"),
-        (None, u"cp437/año", u"cp437/año", u"año", 0, "Folder"),
-        (None, u"big5/廣州", u"big5/廣州", u"廣州", 0, "Folder"),
+        (None, "windows_1252/søster", "windows_1252/søster", "søster", 0, "Folder"),
+        (None, "cp437/año", "cp437/año", "año", 0, "Folder"),
+        (None, "big5/廣州", "big5/廣州", "廣州", 0, "Folder"),
         (None, "test_dir", "test_dir", "test_dir", 0, "Folder"),
     ]
     res.sort()
@@ -516,9 +516,9 @@ def test_sf_handler(database, tmp_path):
         (
             None,
             "file",
-            u"Q28205479🖤.info",
+            "Q28205479🖤.info",
             "",
-            u"Q28205479🖤.info",
+            "Q28205479🖤.info",
             8,
             "File",
             "info",
@@ -530,8 +530,8 @@ def test_sf_handler(database, tmp_path):
         (
             None,
             "file",
-            u"big5/廣州/big5_encoded_dirs.txt",
-            u"big5/廣州",
+            "big5/廣州/big5_encoded_dirs.txt",
+            "big5/廣州",
             "big5_encoded_dirs.txt",
             96,
             "File",
@@ -544,8 +544,8 @@ def test_sf_handler(database, tmp_path):
         (
             None,
             "file",
-            u"cp437/año/cp437_encoded_dirs.txt",
-            u"cp437/año",
+            "cp437/año/cp437_encoded_dirs.txt",
+            "cp437/año",
             "cp437_encoded_dirs.txt",
             97,
             "File",
@@ -558,8 +558,8 @@ def test_sf_handler(database, tmp_path):
         (
             None,
             "file",
-            u"cp437/café/cp437_encoded_dirs.txt",
-            u"cp437/café",
+            "cp437/café/cp437_encoded_dirs.txt",
+            "cp437/café",
             "cp437_encoded_dirs.txt",
             97,
             "File",
@@ -572,8 +572,8 @@ def test_sf_handler(database, tmp_path):
         (
             None,
             "file",
-            u"emoji/chess-♕♖♗♘♙♚♛♜♝♞♟/utf-8_encoded_dirs.txt",
-            u"emoji/chess-♕♖♗♘♙♚♛♜♝♞♟",
+            "emoji/chess-♕♖♗♘♙♚♛♜♝♞♟/utf-8_encoded_dirs.txt",
+            "emoji/chess-♕♖♗♘♙♚♛♜♝♞♟",
             "utf-8_encoded_dirs.txt",
             97,
             "File",
@@ -586,8 +586,8 @@ def test_sf_handler(database, tmp_path):
         (
             None,
             "file",
-            u"emoji/hearts-❤💖💙💚💛💜💝/utf-8_encoded_dirs.txt",
-            u"emoji/hearts-❤💖💙💚💛💜💝",
+            "emoji/hearts-❤💖💙💚💛💜💝/utf-8_encoded_dirs.txt",
+            "emoji/hearts-❤💖💙💚💛💜💝",
             "utf-8_encoded_dirs.txt",
             97,
             "File",
@@ -600,8 +600,8 @@ def test_sf_handler(database, tmp_path):
         (
             None,
             "file",
-            u"shift_jis/ぽっぷるメイル/shift-jis_encoded_dirs.txt",
-            u"shift_jis/ぽっぷるメイル",
+            "shift_jis/ぽっぷるメイル/shift-jis_encoded_dirs.txt",
+            "shift_jis/ぽっぷるメイル",
             "shift-jis_encoded_dirs.txt",
             101,
             "File",
@@ -642,8 +642,8 @@ def test_sf_handler(database, tmp_path):
         (
             None,
             "file",
-            u"windows_1252/søster/cp1252_encoded_dirs.txt",
-            u"windows_1252/søster",
+            "windows_1252/søster/cp1252_encoded_dirs.txt",
+            "windows_1252/søster",
             "cp1252_encoded_dirs.txt",
             98,
             "File",
@@ -701,7 +701,7 @@ def test_sf_handler(database, tmp_path):
             "DROID_SignatureFile_V97.xml; container-signature-20201001.xml",
         ),
         (
-            u"Q28205479🖤.info",
+            "Q28205479🖤.info",
             2,
             "None",
             "None",
@@ -895,7 +895,7 @@ def test_sf_handler(database, tmp_path):
             "tika-mimetypes.xml (1.24, 2020-04-17)",
         ),
         (
-            u"Q28205479🖤.info",
+            "Q28205479🖤.info",
             2,
             "None",
             "None",
@@ -1089,7 +1089,7 @@ def test_sf_handler(database, tmp_path):
             "freedesktop.org.xml (2.0, 2020-06-05)",
         ),
         (
-            u"Q28205479🖤.info",
+            "Q28205479🖤.info",
             2,
             "None",
             "None",
@@ -1298,7 +1298,7 @@ def test_sf_handler(database, tmp_path):
             "fddXML.zip (2020-09-02, DROID_SignatureFile_V97.xml, container-signature-20201001.xml)",
         ),
         (
-            u"Q28205479🖤.info",
+            "Q28205479🖤.info",
             2,
             "None",
             "None",
@@ -1453,7 +1453,7 @@ def test_sf_handler(database, tmp_path):
     assert res == expected
 
 
-SIEGFRIED_YAML_SKELETONS = u"""---
+SIEGFRIED_YAML_SKELETONS = """---
 siegfried   : 1.9.1
 scandate    : 2021-07-25T17:11:02+02:00
 signature   : default.sig
@@ -4030,30 +4030,30 @@ def test_sqlite_output_utilities_sf(database, tmp_path):
     cursor = database.cursor
     dir_ = tmp_path
     sf_yaml = dir_ / "sf_test.yaml"
-    sf_yaml.write_text(SIEGFRIED_YAML_SKELETONS.strip())
+    sf_yaml.write_text(SIEGFRIED_YAML_SKELETONS.strip(), encoding="UTF-8")
     sfloader = SFLoader(basedb)
     sfloader.create_sf_database(str(sf_yaml), cursor)
 
     res = cursor.execute("SELECT FILE_PATH, URI, URI_SCHEME from FILEDATA").fetchall()
 
     assert res[0] == (
-        u"fixtures/archive-types/container-example-four.tar.gz",
+        "fixtures/archive-types/container-example-four.tar.gz",
         None,
         "file",
     )
     assert res[1] == (
-        u"fixtures/archive-types/container-example-four.tar.gz#container-example-four.tar",
+        "fixtures/archive-types/container-example-four.tar.gz#container-example-four.tar",
         None,
         "container",
     )
     assert res[2] == (
-        u"fixtures/archive-types/container-example-four.tar.gz#container-example-four.tar#dirs_with_various_encodings/cp437/año/cp437_encoded_dirs.txt",
+        "fixtures/archive-types/container-example-four.tar.gz#container-example-four.tar#dirs_with_various_encodings/cp437/año/cp437_encoded_dirs.txt",
         None,
         "container",
     )
 
 
-SF_MISMATCH_AND_MULTI = u"""---
+SF_MISMATCH_AND_MULTI = """---
 siegfried   : 1.9.1
 scandate    : 2021-12-05T20:27:50+01:00
 signature   : default.sig
@@ -4150,7 +4150,7 @@ def test_multi_ids(database, tmp_path):
     cursor = database.cursor
     dir_ = tmp_path
     sf_yaml = dir_ / "sf_test.yaml"
-    sf_yaml.write_text(SF_MISMATCH_AND_MULTI.strip())
+    sf_yaml.write_text(SF_MISMATCH_AND_MULTI.strip(), encoding="UTF-8")
     sfloader = SFLoader(basedb)
     sfloader.create_sf_database(str(sf_yaml), cursor)
 
@@ -4191,7 +4191,7 @@ def test_extension_mismatch(database, tmp_path):
     cursor = database.cursor
     dir_ = tmp_path
     sf_yaml = dir_ / "sf_test.yaml"
-    sf_yaml.write_text(SF_MISMATCH_AND_MULTI.strip())
+    sf_yaml.write_text(SF_MISMATCH_AND_MULTI.strip(), encoding="UTF-8")
     sfloader = SFLoader(basedb)
     sfloader.create_sf_database(str(sf_yaml), cursor)
 
