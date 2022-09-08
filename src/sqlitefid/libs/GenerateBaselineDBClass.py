@@ -176,9 +176,9 @@ class GenerateBaselineDB:
             elif column == "YEAR":
                 table = self.createfield(table, column, "INTEGER")
             elif column == "FILE_ID":
-                table = self.createfield(table, column, "integer primary key")
+                table = self.createfield(table, column, "INTEGER primary key")
             elif column in ("PARENT_ID", "INPUT_ID", "SIZE"):
-                table = self.createfield(table, column, "integer")
+                table = self.createfield(table, column, "INTEGER")
             else:
                 table = self.createfield(table, column)
         table = "{} FOREIGN KEY(FILE_ID) REFERENCES IDRESULTS(FILE_ID), ".format(table)
@@ -189,11 +189,11 @@ class GenerateBaselineDB:
         table = "CREATE TABLE " + self.IDTABLE + " ("
         for column in self.IDTABLE_TABLE:
             if column == self.IDID:
-                table = self.createfield(table, column, "integer primary key")
+                table = self.createfield(table, column, "INTEGER PRIMARY KEY")
             elif column == self.NSID:
-                table = self.createfield(table, column, "integer")
+                table = self.createfield(table, column, "INTEGER")
             elif column == "EXTENSION_MISMATCH":
-                table = self.createfield(table, column, "boolean")
+                table = self.createfield(table, column, "BOOLEAN")
             else:
                 table = self.createfield(table, column)
         table = "{} FOREIGN KEY(ID_ID) REFERENCES IDRESULTS(ID_ID), ".format(table)

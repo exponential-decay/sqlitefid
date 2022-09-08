@@ -14,7 +14,6 @@ except ModuleNotFoundError:
         GenerateBaselineDB,
     )
 
-
 FIDDatabase = collections.namedtuple("FIDDatabase", "baseline cursor")
 
 
@@ -46,15 +45,15 @@ def test_base_db(database):
     res = cursor.execute("PRAGMA table_info(FILEDATA)").fetchall()
 
     assert res == [
-        (0, "FILE_ID", "integer", 0, None, 1),
-        (1, "INPUT_ID", "integer", 0, None, 0),
-        (2, "PARENT_ID", "integer", 0, None, 0),
+        (0, "FILE_ID", "INTEGER", 0, None, 1),
+        (1, "INPUT_ID", "INTEGER", 0, None, 0),
+        (2, "PARENT_ID", "INTEGER", 0, None, 0),
         (3, "URI", "", 0, None, 0),
         (4, "URI_SCHEME", "", 0, None, 0),
         (5, "FILE_PATH", "", 0, None, 0),
         (6, "DIR_NAME", "", 0, None, 0),
         (7, "NAME", "", 0, None, 0),
-        (8, "SIZE", "integer", 0, None, 0),
+        (8, "SIZE", "INTEGER", 0, None, 0),
         (9, "TYPE", "", 0, None, 0),
         (10, "EXT", "", 0, None, 0),
         (11, "LAST_MODIFIED", "TIMESTAMP", 0, None, 0),
@@ -66,8 +65,8 @@ def test_base_db(database):
     res = cursor.execute("PRAGMA table_info(IDDATA)").fetchall()
 
     assert res == [
-        (0, "ID_ID", "integer", 0, None, 1),
-        (1, "NS_ID", "integer", 0, None, 0),
+        (0, "ID_ID", "INTEGER", 0, None, 1),
+        (1, "NS_ID", "INTEGER", 0, None, 0),
         (2, "METHOD", "", 0, None, 0),
         (3, "STATUS", "", 0, None, 0),
         (4, "ID", "", 0, None, 0),
@@ -75,7 +74,7 @@ def test_base_db(database):
         (6, "MIME_TYPE", "", 0, None, 0),
         (7, "FORMAT_NAME", "", 0, None, 0),
         (8, "FORMAT_VERSION", "", 0, None, 0),
-        (9, "EXTENSION_MISMATCH", "boolean", 0, None, 0),
+        (9, "EXTENSION_MISMATCH", "BOOLEAN", 0, None, 0),
         (10, "WARNING", "", 0, None, 0),
     ]
 
