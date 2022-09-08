@@ -72,7 +72,7 @@ class GenerateBaselineDB:
         self.tooltype = None
         self.log = debug
         if in_memory:
-            self.dbname = "file::memory:?cache=shared"
+            self.dbname = ":memory:"
         else:
             # For compatibility non-memory databases require this.
             self.dbname = self.getDBFilename(export)
