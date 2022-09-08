@@ -100,7 +100,7 @@ class GenericCSVHandler:
         csvlist = None
         if os.path.isfile(csv_file_name):
             csvlist = []
-            with open(csv_file_name, "r") as csvfile:
+            with open(csv_file_name, "r", encoding="UTF-8") as csvfile:
 
                 if self.BOM is True:
                     csvfile.seek(len(self.BOMVAL))

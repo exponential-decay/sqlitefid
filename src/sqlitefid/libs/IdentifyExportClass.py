@@ -68,7 +68,7 @@ class IdentifyExport:
         droid_magic = ""
 
         try:
-            with open(export, "r") as f:
+            with open(export, "r", encoding="UTF-8") as f:
                 droid_magic = f.readline()
                 sf_magic = droid_magic + f.readline()
         except IOError as err:
