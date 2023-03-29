@@ -5,8 +5,6 @@ tools. While the code works, it could do with some further work to
 bring it up to scratch.
 """
 
-from __future__ import absolute_import, print_function
-
 import datetime
 import logging
 import re

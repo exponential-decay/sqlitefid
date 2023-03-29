@@ -12,8 +12,6 @@
 Siegfried YAML file so that it can be parsed into an sqlite DB.
 """
 
-from __future__ import absolute_import
-
 import io
 import logging
 import ntpath

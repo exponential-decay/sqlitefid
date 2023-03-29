@@ -4,8 +4,6 @@
 sqlite DB we will analyze all identification results with.
 """
 
-from __future__ import absolute_import
-
 import logging
 import sqlite3
 import time

@@ -5,8 +5,6 @@
 Mapping of tool output fields to database fields.
 """
 
-from __future__ import absolute_import
-
 
 class ToolMapping:
     """ToolMapping."""

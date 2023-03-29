@@ -13,8 +13,6 @@ writing it into a temporary file before handing it over to the primary
 code runner.
 """
 
-from __future__ import absolute_import
-
 import logging
 import tempfile
 

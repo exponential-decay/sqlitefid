@@ -11,8 +11,6 @@ Siegfried and maps it to a sqlite database for higher performance
 analysis of format identification results.
 """
 
-from __future__ import absolute_import
-
 import argparse
 import logging
 import os

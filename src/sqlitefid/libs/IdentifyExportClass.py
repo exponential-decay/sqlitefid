@@ -4,8 +4,6 @@
 provided to sqlitefid. It largely does this using magic numbers.
 """
 
-from __future__ import absolute_import
-
 import logging
 import re
 

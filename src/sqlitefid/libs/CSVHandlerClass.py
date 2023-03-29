@@ -10,8 +10,6 @@
 Handles the CSV inputs for demystify.
 """
 
-from __future__ import absolute_import
-
 import logging
 import os.path
 from urllib.parse import urlparse

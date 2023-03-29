@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import absolute_import
-
 import csv
 
 # The unicode type is not supported in Python 3 and so we may hit this error at

@@ -9,8 +9,6 @@
 DROID data into the sqlite db.
 """
 
-from __future__ import absolute_import, print_function
-
 import logging
 from sqlite3 import OperationalError
 
