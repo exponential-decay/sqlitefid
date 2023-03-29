@@ -5,7 +5,7 @@
 Stores and returns the version of sqlitefid.
 """
 
-__version__ = "v3.0.0rc2"
+__version__ = "v4.0.0rc1"
 
 
 class SqliteFIDVersion:
