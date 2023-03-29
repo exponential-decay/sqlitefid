@@ -208,6 +208,7 @@ def test_sqlite_output_droid(database, tmp_path):
             "6",
             "False",
             None,
+            None,
         )
 
     res = cursor.execute("SELECT * FROM IDRESULTS").fetchall()
