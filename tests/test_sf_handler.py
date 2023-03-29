@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import absolute_import
+import pytest
 
 try:
     from sqlitefid.src.sqlitefid.libs.SFHandlerClass import IDResult, SFYAMLHandler
@@ -3198,7 +3198,7 @@ matches  :
     format  : 'Plain Text File'
     version :
     mime    : 'text/plain'
-    class   :
+    class   : 'CLASSIFICATION'
     basis   : 'text match ASCII'
     warning : 'match on text only; extension mismatch'
 """
@@ -3214,3 +3214,22 @@ def test_sf_19(tmp_path):
 
     sf = SFYAMLHandler()
     sf.read_sf_yaml(str(sf_yaml))
+
+    # Access files in processed data to verify integrity.
+    files = sf.sfdata["files"]
+
+    assert len(files) == 1
+
+    # Access files in processed data to verify integrity.
+    files = sf.sfdata["files"]
+    assert len(files) == 1
+    # Make various assertions about what we've read from the report.
+    assert files[0]["filename"] == "wikibase_custom_test.go"
+    assert files[0]["filesize"] == "4980"
+    assert files[0]["modified"] == "2022-09-07T10:07:15+02:00"
+    assert files[0]["errors"] is None
+    assert files[0]["type"] == "File"
+    assert files[0]["uri_scheme"] == "file"
+    assert files[0]["identification"][0].id == "x-fmt/111"
+    with pytest.raises(AttributeError):
+      assert files[0]["identification"][0].class_ == "CLASSIFICATION"

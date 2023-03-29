@@ -190,6 +190,7 @@ class SFYAMLHandler:
         KEY_MATCHES = "matches"
         KEY_FULL = "full"
         KEY_WARNING = "warning"
+        KEY_CLASS = "class"
 
         filedict = {}
         idlist = []
@@ -220,7 +221,7 @@ class SFYAMLHandler:
                 except IDError as err:
                     # Field doesn't exist in the class and that might be just
                     # fine.
-                    if key != KEY_MATCHES and key != KEY_FULL:
+                    if key != KEY_MATCHES and key != KEY_FULL and key != KEY_CLASS:
                         raise err
                 if key == KEY_WARNING:
                     # Results all added to an entry... warning should be the
@@ -297,7 +298,8 @@ class SFYAMLHandler:
 
         # Add final section of data to list.
         if len(filedata) > 0:
-            self.files.append(self.process_file_section(filedata))
+            filesection = self.process_file_section(filedata)
+            self.files.append(filesection)
 
         # Add header and file details.
         self.sfdata[self.DICTHEADER] = self.header

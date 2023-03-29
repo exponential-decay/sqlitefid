@@ -59,7 +59,7 @@ class SFLoader:
                 name = name[1]
             except IndexError:
                 name = dir_
-            ins = u"INSERT INTO {0} (FILE_PATH, DIR_NAME, NAME,SIZE, TYPE) VALUES ('{1}', '{1}', '{2}', 0, 'Folder');".format(
+            ins = "INSERT INTO {0} (FILE_PATH, DIR_NAME, NAME,SIZE, TYPE) VALUES ('{1}', '{1}', '{2}', 0, 'Folder');".format(
                 self.basedb.FILEDATATABLE, dir_, name
             )
             cursor.execute(ins)
@@ -189,3 +189,4 @@ class SFLoader:
         # Finally, add directories to the file table.
         uniquedirs = set(dirlist)
         self.add_dirs_to_db(uniquedirs, cursor)
+        cursor.execute("COMMIT;")
