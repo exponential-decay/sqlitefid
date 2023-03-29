@@ -75,7 +75,7 @@ def test_fido_handler_BOM():
     assert res[0][FILE_SIZE] == "249856"
     assert res[8][FILE_SIZE] == "159"
 
-    assert res[0][FILE_NAME] == u"data/🖤opf-test-corpus-droid-analysis.db"
+    assert res[0][FILE_NAME] == "data/🖤opf-test-corpus-droid-analysis.db"
     assert res[8][FILE_NAME] == "__init__.pyc"
 
     assert res[0][MIME] == "application/x-sqlite3"

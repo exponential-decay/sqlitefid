@@ -101,13 +101,11 @@ class GenericCSVHandler:
         if os.path.isfile(csv_file_name):
             csvlist = []
             with open(csv_file_name, "r", encoding="UTF-8") as csvfile:
-
                 if self.BOM is True:
                     csvfile.seek(len(self.BOMVAL))
 
                 # inspect line by reading it first.
                 for lineno, line in enumerate(csvfile):
-
                     # check line for characters we can't parse...
                     line = self.checkline(line, lineno)
 
@@ -124,12 +122,11 @@ class GenericCSVHandler:
                             columncount = len(header_list)
 
                     for row in csvreader:
-
                         # for each column in header
                         # note: don't need ID data. Ignoring multiple ID.
                         for i in range(columncount):
                             if i == FORMAT_COUNT:
-                                if row[i] != u"":
+                                if row[i] != "":
                                     count = int(row[i])
                                 else:
                                     count = 0

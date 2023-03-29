@@ -33,7 +33,7 @@ class DROIDLoader:
         self.basedb.tooltype = "droid"
 
     def insertfiledbstring(self, keys, values):
-        ins = u"INSERT INTO {} ({}) VALUES ({});".format(
+        ins = "INSERT INTO {} ({}) VALUES ({});".format(
             self.basedb.FILEDATATABLE, keys.strip(", "), values.strip(", ")
         )
         return ins
@@ -99,7 +99,6 @@ class DROIDLoader:
         droidlist = droidcsvhandler.adddirname(droidlist)
 
         for file in droidlist:
-
             folder = False
             if file["TYPE"].lower() == "folder":
                 folder = True
@@ -130,10 +129,9 @@ class DROIDLoader:
                 pass
 
             for key, value in file.items():
-
                 try:
                     # Convert the value to Unicode to work with.
-                    value = u"{}".format(value)
+                    value = "{}".format(value)
                 except AttributeError:
                     pass
 
@@ -146,10 +144,10 @@ class DROIDLoader:
                     if "_HASH" in key:
                         self.basedb.hashtype = key.split("_", 1)[0]
                 if key in ToolMapping.DROID_FILE_MAP:
-                    filekeystring = u"{}{}, ".format(
+                    filekeystring = "{}{}, ".format(
                         filekeystring, ToolMapping.DROID_FILE_MAP[key]
                     )
-                    filevaluestring = u'{}"{}", '.format(filevaluestring, value)
+                    filevaluestring = '{}"{}", '.format(filevaluestring, value)
 
                 if MULTIPLE is False:
                     if key in ToolMapping.DROID_ID_MAP:
@@ -158,10 +156,10 @@ class DROIDLoader:
                                 value = True
                             else:
                                 value = False
-                        idkeystring = u"{}{}, ".format(
+                        idkeystring = "{}{}, ".format(
                             idkeystring, ToolMapping.DROID_ID_MAP[key]
                         )
-                        idvaluestring = u'{} "{}", '.format(idvaluestring, value)
+                        idvaluestring = '{} "{}", '.format(idvaluestring, value)
                 else:
                     if MULTIPLE_DONE is False:
                         (MULTIPLE_KEY_LIST, MULTIPLE_VALUE_LIST) = self.populateIDTable(
