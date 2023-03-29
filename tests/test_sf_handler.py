@@ -3177,3 +3177,40 @@ def test_bad_yaml(tmp_path):
         assert file.get("filename", False)
         gathered.append(file.get("filename", False))
     assert gathered == expected
+
+
+SF_10 = """---
+siegfried   : 1.10.0
+scandate    : 2023-03-29T11:12:29+02:00
+signature   : default.sig
+created     : 2023-03-23T15:09:43Z
+identifiers :
+  - name    : 'pronom'
+    details : 'DROID_SignatureFile_V111.xml; container-signature-20230307.xml'
+---
+filename : 'wikibase_custom_test.go'
+filesize : 4980
+modified : 2022-09-07T10:07:15+02:00
+errors   :
+matches  :
+  - ns      : 'pronom'
+    id      : 'x-fmt/111'
+    format  : 'Plain Text File'
+    version :
+    mime    : 'text/plain'
+    class   :
+    basis   : 'text match ASCII'
+    warning : 'match on text only; extension mismatch'
+"""
+
+
+def test_sf_19(tmp_path):
+    """Siegfried 1.10 introduces a new "class" field. We should handle
+    this without error.
+    """
+    dir_ = tmp_path
+    sf_yaml = dir_ / "sf_test.yaml"
+    sf_yaml.write_text(SF_10.strip(), encoding="UTF-8")
+
+    sf = SFYAMLHandler()
+    sf.read_sf_yaml(str(sf_yaml))
