@@ -9,8 +9,6 @@
 into the sqlite db.
 """
 
-from __future__ import absolute_import
-
 # Required imports for main from root.
 from .SFHandlerClass import SFYAMLHandler
 from .ToolMappingClass import ToolMapping
@@ -80,7 +78,7 @@ class SFLoader:
         header_list = []
         value_list = []
 
-        HEADERS = "ID, FORMAT_NAME, FORMAT_VERSION, MIME_TYPE, METHOD, BASIS, WARNING, EXTENSION_MISMATCH, STATUS, NS_ID"
+        HEADERS = "ID, FORMAT_NAME, FORMAT_VERSION, MIME_TYPE, METHOD, BASIS, WARNING, EXTENSION_MISMATCH, STATUS, NS_ID, CLASSIFICATION"
 
         for id_ in id_records:
             header_list.append(HEADERS)
@@ -176,8 +174,8 @@ class SFLoader:
                 )
 
             rowlist = []
-            for i in insert:
-                cursor.execute(i)
+            for ins in insert:
+                cursor.execute(ins)
                 rowlist.append(cursor.lastrowid)
 
             for rowid in rowlist:

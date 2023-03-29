@@ -76,6 +76,7 @@ def test_base_db(database):
         (8, "FORMAT_VERSION", "", 0, None, 0),
         (9, "EXTENSION_MISMATCH", "BOOLEAN", 0, None, 0),
         (10, "WARNING", "", 0, None, 0),
+        (11, "CLASSIFICATION", "", 0, None, 0),
     ]
 
     res = cursor.execute("PRAGMA table_info(IDRESULTS)").fetchall()

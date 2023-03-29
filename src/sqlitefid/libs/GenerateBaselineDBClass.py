@@ -60,6 +60,7 @@ class GenerateBaselineDB:
         "FORMAT_VERSION",
         "EXTENSION_MISMATCH",
         "WARNING",
+        "CLASSIFICATION",
     ]
 
     # NAMESPACE_TABLE

@@ -68,4 +68,5 @@ class ToolMapping:
         "version": "FORMAT_VERSION",  # no version in tika or freedesktop ids
         "extension_mismatch": "EXTENSION_MISMATCH",
         "warning": "WARNING",
+        "classification": "CLASSIFICATION",
     }

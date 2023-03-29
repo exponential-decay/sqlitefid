@@ -190,7 +190,6 @@ class SFYAMLHandler:
         KEY_MATCHES = "matches"
         KEY_FULL = "full"
         KEY_WARNING = "warning"
-        KEY_CLASS = "class"
 
         filedict = {}
         idlist = []
@@ -221,7 +220,7 @@ class SFYAMLHandler:
                 except IDError as err:
                     # Field doesn't exist in the class and that might be just
                     # fine.
-                    if key != KEY_MATCHES and key != KEY_FULL and key != KEY_CLASS:
+                    if key != KEY_MATCHES and key != KEY_FULL:
                         raise err
                 if key == KEY_WARNING:
                     # Results all added to an entry... warning should be the
@@ -413,8 +412,8 @@ class IDResult(object):
     """
 
     ns = None
-    id = None
-    format = None
+    id_ = None
+    format_ = None
     version = None
     mime = None
     method = None
@@ -422,6 +421,7 @@ class IDResult(object):
     warning = None
     mismatch = None
     status = None
+    class_ = None
 
     mismatch_warning = "extension mismatch"
     filename_only = "match on filename only"
@@ -444,9 +444,19 @@ class IDResult(object):
         FIELD_WARNING = "warning"
         FIELD_MIME = "mime"
         FIELD_STATUS = "status"
-
         VALUE_UNK = "UNKNOWN"
 
+        FIELD_ID = "id"
+        FIELD_FORMAT = "format"
+        FIELD_CLASS = "class"
+
+        RESERVED = (FIELD_ID, FIELD_FORMAT, FIELD_CLASS)
+
+        # Rename field to avoid reserved names in Python.
+        if field in RESERVED:
+            field = f"{field}_"
+
+        # Handle other fields from Siegfried's YAML.
         if not hasattr(self, field):
             raise IDError("Field '%s' doesn't exist" % field)
         if field == FIELD_STATUS:
@@ -509,28 +519,31 @@ class IDResult(object):
         The insert requires a string, for the headers:
 
             'ID, FORMAT_NAME, FORMAT_VERSION, MIME_TYPE,
-             METHOD, BASIS, WARNING, NS_ID'
+             METHOD, BASIS, WARNING, NS_ID, CLASSIFICATION'
         """
-        return "'{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}'".format(
-            self.id,
-            self.format,
-            self.version,
-            self.mime,
-            self.method,
-            self.basis,
-            self.warning,
-            self.mismatch,
-            self.status,
-            ns_id,
+        return (
+            "'{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}'".format(
+                self.id_,
+                self.format_,
+                self.version,
+                self.mime,
+                self.method,
+                self.basis,
+                self.warning,
+                self.mismatch,
+                self.status,
+                ns_id,
+                self.class_,
+            )
         )
 
     def __eq__(self, other):
         """Equality comparison for IDRecord class."""
         if self.ns != other.ns:
             return False
-        if self.id != other.id:
+        if self.id_ != other.id_:
             return False
-        if self.format != other.format:
+        if self.format_ != other.format_:
             return False
         if self.version != other.version:
             return False
@@ -545,5 +558,7 @@ class IDResult(object):
         if self.mismatch != other.mismatch:
             return False
         if self.status != other.status:
+            return False
+        if self.class_ != other.class_:
             return False
         return True

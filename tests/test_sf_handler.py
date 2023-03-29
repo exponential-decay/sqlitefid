@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import pytest
-
 try:
     from sqlitefid.src.sqlitefid.libs.SFHandlerClass import IDResult, SFYAMLHandler
 except ModuleNotFoundError:
@@ -208,8 +206,8 @@ def test_read_sf_yaml(tmp_path):
     ns = [item.ns for item in compare_ids]
     assert ns == ["pronom", "tika", "freedesktop.org", "loc"]
 
-    id_ = [item.id for item in compare_ids]
-    format_ = [item.format for item in compare_ids]
+    id_ = [item.id_ for item in compare_ids]
+    format_ = [item.format_ for item in compare_ids]
     mime = [item.mime for item in compare_ids]
     basis = [item.basis for item in compare_ids]
     warning = [item.warning for item in compare_ids]
@@ -238,8 +236,8 @@ def test_read_sf_yaml(tmp_path):
     ns = [item.ns for item in compare_ids]
     assert ns == ["pronom", "tika", "freedesktop.org", "freedesktop.org", "loc"]
 
-    id_ = [item.id for item in compare_ids]
-    format_ = [item.format for item in compare_ids]
+    id_ = [item.id_ for item in compare_ids]
+    format_ = [item.format_ for item in compare_ids]
     mime = [item.mime for item in compare_ids]
     basis = [item.basis for item in compare_ids]
     warning = [item.warning for item in compare_ids]
@@ -2969,8 +2967,8 @@ def test_read_sf_yaml_skeletons(tmp_path):
     id_3 = IDResult()
 
     id_0.ns = "pronom"
-    id_0.id = "x-fmt/265"
-    id_0.format = "Tape Archive Format"
+    id_0.id_ = "x-fmt/265"
+    id_0.format_ = "Tape Archive Format"
     id_0.version = None
     id_0.mime = "application/x-tar"
     id_0.method = "Signature"
@@ -2978,10 +2976,11 @@ def test_read_sf_yaml_skeletons(tmp_path):
     id_0.warning = None
     id_0.mismatch = False
     id_0.status = None
+    id_0.class_ = None
 
     id_1.ns = "tika"
-    id_1.id = "application/x-gtar"
-    id_1.format = "GNU tar Compressed File Archive (GNU Tape Archive)"
+    id_1.id_ = "application/x-gtar"
+    id_1.format_ = "GNU tar Compressed File Archive (GNU Tape Archive)"
     id_1.version = None
     id_1.mime = "application/x-gtar"
     id_1.method = "Signature"
@@ -2989,10 +2988,11 @@ def test_read_sf_yaml_skeletons(tmp_path):
     id_1.warning = "filename mismatch"
     id_1.mismatch = False
     id_1.status = None
+    id_0.class_ = None
 
     id_2.ns = "freedesktop.org"
-    id_2.id = "application/x-tar"
-    id_2.format = "Tar archive"
+    id_2.id_ = "application/x-tar"
+    id_2.format_ = "Tar archive"
     id_2.version = None
     id_2.mime = "application/x-tar"
     id_2.method = "Signature"
@@ -3000,10 +3000,11 @@ def test_read_sf_yaml_skeletons(tmp_path):
     id_2.warning = None
     id_2.mismatch = False
     id_2.status = None
+    id_0.class_ = None
 
     id_3.ns = "loc"
-    id_3.id = "UNKNOWN"
-    id_3.format = None
+    id_3.id_ = "UNKNOWN"
+    id_3.format_ = None
     id_3.version = None
     id_3.mime = None
     id_3.method = None
@@ -3011,6 +3012,7 @@ def test_read_sf_yaml_skeletons(tmp_path):
     id_3.warning = "no match"
     id_3.mismatch = False
     id_3.status = None
+    id_0.class_ = None
 
     assert id_0 == identification[0]
     assert id_1 == identification[1]
@@ -3032,8 +3034,8 @@ def test_read_sf_yaml_skeletons(tmp_path):
     identification = files[2].get("identification")
 
     id_0.ns = "pronom"
-    id_0.id = "x-fmt/111"
-    id_0.format = "Plain Text File"
+    id_0.id_ = "x-fmt/111"
+    id_0.format_ = "Plain Text File"
     id_0.version = None
     id_0.mime = "text/plain"
     id_0.method = "Text"
@@ -3043,8 +3045,8 @@ def test_read_sf_yaml_skeletons(tmp_path):
     id_0.status = None
 
     id_1.ns = "tika"
-    id_1.id = "text/plain"
-    id_1.format = None
+    id_1.id_ = "text/plain"
+    id_1.format_ = None
     id_1.version = None
     id_1.mime = "text/plain"
     id_1.method = "Text"
@@ -3054,8 +3056,8 @@ def test_read_sf_yaml_skeletons(tmp_path):
     id_1.status = None
 
     id_2.ns = "freedesktop.org"
-    id_2.id = "text/plain"
-    id_2.format = "plain text document"
+    id_2.id_ = "text/plain"
+    id_2.format_ = "plain text document"
     id_2.version = None
     id_2.mime = "application/x-tar"
     id_2.method = "Text"
@@ -3065,8 +3067,8 @@ def test_read_sf_yaml_skeletons(tmp_path):
     id_2.status = None
 
     id_3.ns = "loc"
-    id_3.id = "fdd000284"
-    id_3.format = "ESRI ArcInfo Coverage"
+    id_3.id_ = "fdd000284"
+    id_3.format_ = "ESRI ArcInfo Coverage"
     id_3.version = None
     id_3.mime = None
     id_3.method = "Extension"
@@ -3230,6 +3232,5 @@ def test_sf_19(tmp_path):
     assert files[0]["errors"] is None
     assert files[0]["type"] == "File"
     assert files[0]["uri_scheme"] == "file"
-    assert files[0]["identification"][0].id == "x-fmt/111"
-    with pytest.raises(AttributeError):
-      assert files[0]["identification"][0].class_ == "CLASSIFICATION"
+    assert files[0]["identification"][0].id_ == "x-fmt/111"
+    assert files[0]["identification"][0].class_ == "CLASSIFICATION"
