@@ -68,6 +68,7 @@ def handleDROIDCSV(droidcsv, BOM=False, in_memory=False):
     loader = DROIDLoader(basedb, BOM, debug=debug)
     loader.create_droid_database(droidcsv, basedb.getcursor())
     basedb.createDBMD()
+    basedb.conn.commit()
     return basedb.conn
 
 
@@ -81,6 +82,7 @@ def handleSFYAML(sfexport, in_memory=False):
     loader = SFLoader(basedb)
     loader.create_sf_database(sfexport, basedb.getcursor())
     basedb.createDBMD()
+    basedb.conn.commit()
     return basedb.conn
 
 
