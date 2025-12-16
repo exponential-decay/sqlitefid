@@ -188,6 +188,12 @@ class SFYAMLHandler:
         KEY_MATCHES = "matches"
         KEY_FULL = "full"
         KEY_WARNING = "warning"
+        KEY_URI = "URI"
+        KEY_PERMA = "permalink"
+
+        # Some of these aren't handled yet, but we might want to,
+        # e.g. KEY_PERMA is from Wikidata.
+        FIELDS_TO_IGNORE = (KEY_MATCHES, KEY_FULL, KEY_URI, KEY_PERMA)
 
         filedict = {}
         idlist = []
@@ -218,7 +224,7 @@ class SFYAMLHandler:
                 except IDError as err:
                     # Field doesn't exist in the class and that might be just
                     # fine.
-                    if key != KEY_MATCHES and key != KEY_FULL:
+                    if key not in FIELDS_TO_IGNORE:
                         raise err
                 if key == KEY_WARNING:
                     # Results all added to an entry... warning should be the
