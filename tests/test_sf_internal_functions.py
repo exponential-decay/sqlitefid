@@ -2,11 +2,7 @@
 
 import pytest
 
-try:
-    from sqlitefid.src.sqlitefid.libs import PyDateHandler, SFHandlerClass
-except ModuleNotFoundError:
-    # Needed when imported as submodule via demystify.
-    from src.demystify.sqlitefid.src.sqlitefid.libs import PyDateHandler, SFHandlerClass
+from src.sqlitefid.libs import PyDateHandler, SFHandlerClass
 
 
 @pytest.mark.parametrize(

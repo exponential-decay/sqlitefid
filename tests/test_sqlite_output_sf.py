@@ -4,17 +4,9 @@ import collections
 
 import pytest
 
-try:
-    from sqlitefid.src.sqlitefid.libs.GenerateBaselineDBClass import GenerateBaselineDB
-    from sqlitefid.src.sqlitefid.libs.SFHandlerClass import SFYAMLHandler
-    from sqlitefid.src.sqlitefid.libs.SFLoaderClass import SFLoader
-except ModuleNotFoundError:
-    # Needed when imported as submodule via demystify.
-    from src.demystify.sqlitefid.src.sqlitefid.libs.GenerateBaselineDBClass import (
-        GenerateBaselineDB,
-    )
-    from src.demystify.sqlitefid.src.sqlitefid.libs.SFHandlerClass import SFYAMLHandler
-    from src.demystify.sqlitefid.src.sqlitefid.libs.SFLoaderClass import SFLoader
+from src.sqlitefid.libs.GenerateBaselineDBClass import GenerateBaselineDB
+from src.sqlitefid.libs.SFHandlerClass import SFYAMLHandler
+from src.sqlitefid.libs.SFLoaderClass import SFLoader
 
 SIEGFRIED_YAML = """---
 siegfried   : 1.9.1
@@ -464,7 +456,14 @@ def test_sf_handler(database, tmp_path):
     expected = [
         (None, "", "", "", 0, "Folder"),
         (None, "cp437/café", "cp437/café", "café", 0, "Folder"),
-        (None, "shift_jis/ぽっぷるメイル", "shift_jis/ぽっぷるメイル", "ぽっぷるメイル", 0, "Folder"),
+        (
+            None,
+            "shift_jis/ぽっぷるメイル",
+            "shift_jis/ぽっぷるメイル",
+            "ぽっぷるメイル",
+            0,
+            "Folder",
+        ),
         (
             None,
             "emoji/chess-♕♖♗♘♙♚♛♜♝♞♟",

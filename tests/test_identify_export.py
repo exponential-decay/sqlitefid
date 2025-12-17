@@ -1,19 +1,14 @@
 # -*- coding: utf-8 -*-
 
-try:
-    from sqlitefid.src.sqlitefid.libs.IdentifyExportClass import IdentifyExport
-except ModuleNotFoundError:
-    # Needed when imported as submodule via demystify.
-    from src.demystify.sqlitefid.src.sqlitefid.libs.IdentifyExportClass import (
-        IdentifyExport,
-    )
+
+from src.sqlitefid.libs.IdentifyExportClass import IdentifyExport
 
 DROID_CSV = """"ID","PARENT_ID","URI","FILE_PATH","NAME","METHOD","STATUS","SIZE","TYPE","EXT","LAST_MODIFIED","EXTENSION_MISMATCH","SHA1_HASH","FORMAT_COUNT","PUID","MIME_TYPE","FORMAT_NAME","FORMAT_VERSION"
 "2","0","file:////10.1.4.222/gda/archives-sample-files/opf-format-corpus/format-corpus/","\\10.1.4.222\\gda\archives-sample-files\\opf-format-corpus\format-corpus","🖤format-corpus",,"Done","","Folder",,"2014-02-28T15:49:11","false",,"",,"","",""
 "3","2","file:////10.1.4.222/gda/archives-sample-files/opf-format-corpus/format-corpus/video/","\\10.1.4.222\\gda\archives-sample-files\\opf-format-corpus\format-corpus\video","video",,"Done","","Folder",,"2014-02-28T15:48:47","false",,"",,"","",""
 """
 
-DROID_CSV_BOM = """\xEF\xBB\xBF"ID","PARENT_ID","URI","FILE_PATH","NAME","METHOD","STATUS","SIZE","TYPE","EXT","LAST_MODIFIED","EXTENSION_MISMATCH","SHA1_HASH","FORMAT_COUNT","PUID","MIME_TYPE","FORMAT_NAME","FORMAT_VERSION"
+DROID_CSV_BOM = """\xef\xbb\xbf"ID","PARENT_ID","URI","FILE_PATH","NAME","METHOD","STATUS","SIZE","TYPE","EXT","LAST_MODIFIED","EXTENSION_MISMATCH","SHA1_HASH","FORMAT_COUNT","PUID","MIME_TYPE","FORMAT_NAME","FORMAT_VERSION"
 "2","0","file:////10.1.4.222/gda/archives-sample-files/opf-format-corpus/format-corpus/","\\10.1.4.222\\gda\archives-sample-files\\opf-format-corpus\format-corpus","🖤format-corpus",,"Done","","Folder",,"2014-02-28T15:49:11","false",,"",,"","",""
 "3","2","file:////10.1.4.222/gda/archives-sample-files/opf-format-corpus/format-corpus/video/","\\10.1.4.222\\gda\archives-sample-files\\opf-format-corpus\format-corpus\video","video",,"Done","","Folder",,"2014-02-28T15:48:47","false",,"",,"","",""
 """

@@ -5,16 +5,8 @@ import os
 
 import pytest
 
-try:
-    from sqlitefid.src.sqlitefid.libs.DROIDLoaderClass import DROIDLoader
-    from sqlitefid.src.sqlitefid.libs.GenerateBaselineDBClass import GenerateBaselineDB
-except ModuleNotFoundError:
-    # Needed when imported as submodule via demystify.
-    from src.demystify.sqlitefid.src.sqlitefid.libs.DROIDLoaderClass import DROIDLoader
-    from src.demystify.sqlitefid.src.sqlitefid.libs.GenerateBaselineDBClass import (
-        GenerateBaselineDB,
-    )
-
+from src.sqlitefid.libs.DROIDLoaderClass import DROIDLoader
+from src.sqlitefid.libs.GenerateBaselineDBClass import GenerateBaselineDB
 
 FIDDatabase = collections.namedtuple("FIDDatabase", "baseline cursor")
 

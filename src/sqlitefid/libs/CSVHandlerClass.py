@@ -14,8 +14,16 @@ import logging
 import os.path
 from urllib.parse import urlparse
 
-from . import unicodecsv
-from .PyDateHandler import PyDateHandler
+try:
+    from libs import unicodecsv
+    from libs.PyDateHandler import PyDateHandler
+except ModuleNotFoundError:
+    try:
+        from src.sqlitefid.libs import unicodecsv
+        from src.sqlitefid.libs.PyDateHandler import PyDateHandler
+    except ModuleNotFoundError:
+        from sqlitefid.libs import unicodecsv
+        from sqlitefid.libs.PyDateHandler import PyDateHandler
 
 
 class CSVExportException(Exception):
@@ -26,7 +34,7 @@ class GenericCSVHandler:
     """GenericCSVHandler."""
 
     BOM = False
-    BOMVAL = "\xEF\xBB\xBF"
+    BOMVAL = "\xef\xbb\xbf"
     DICT_FORMATS = "FORMATS"
 
     def __init__(self, BOM=False):

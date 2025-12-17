@@ -17,12 +17,28 @@ import os
 import sys
 import time
 
-from .libs.DROIDLoaderClass import DROIDLoader
-from .libs.FidoLoaderClass import FidoLoader
-from .libs.GenerateBaselineDBClass import GenerateBaselineDB
-from .libs.IdentifyExportClass import IdentifyExport
-from .libs.SFLoaderClass import SFLoader
-from .libs.Version import SqliteFIDVersion
+try:
+    from libs.DROIDLoaderClass import DROIDLoader
+    from libs.FidoLoaderClass import FidoLoader
+    from libs.GenerateBaselineDBClass import GenerateBaselineDB
+    from libs.IdentifyExportClass import IdentifyExport
+    from libs.SFLoaderClass import SFLoader
+    from libs.Version import SqliteFIDVersion
+except ModuleNotFoundError:
+    try:
+        from src.sqlitefid.libs.DROIDLoaderClass import DROIDLoader
+        from src.sqlitefid.libs.FidoLoaderClass import FidoLoader
+        from src.sqlitefid.libs.GenerateBaselineDBClass import GenerateBaselineDB
+        from src.sqlitefid.libs.IdentifyExportClass import IdentifyExport
+        from src.sqlitefid.libs.SFLoaderClass import SFLoader
+        from src.sqlitefid.libs.Version import SqliteFIDVersion
+    except ModuleNotFoundError:
+        from sqlitefid.libs.DROIDLoaderClass import DROIDLoader
+        from sqlitefid.libs.FidoLoaderClass import FidoLoader
+        from sqlitefid.libs.GenerateBaselineDBClass import GenerateBaselineDB
+        from sqlitefid.libs.IdentifyExportClass import IdentifyExport
+        from sqlitefid.libs.SFLoaderClass import SFLoader
+        from sqlitefid.libs.Version import SqliteFIDVersion
 
 LOGFORMAT = "%(asctime)-15s %(levelname)s: %(message)s"
 DATEFORMAT = "%Y-%m-%d %H:%M:%S"

@@ -17,7 +17,13 @@ import logging
 import ntpath
 import os.path
 
-from .PyDateHandler import PyDateHandler
+try:
+    from libs.PyDateHandler import PyDateHandler
+except ModuleNotFoundError:
+    try:
+        from src.sqlitefid.libs.PyDateHandler import PyDateHandler
+    except ModuleNotFoundError:
+        from sqlitefid.libs.PyDateHandler import PyDateHandler
 
 
 class SFYAMLHandler:

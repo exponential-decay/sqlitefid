@@ -3,13 +3,7 @@
 import io
 import sys
 
-try:
-    from sqlitefid.src.sqlitefid.libs.CSVHandlerClass import GenericCSVHandler
-except ModuleNotFoundError:
-    # Needed when imported as submodule via demystify.
-    from src.demystify.sqlitefid.src.sqlitefid.libs.CSVHandlerClass import (
-        GenericCSVHandler,
-    )
+from src.sqlitefid.libs.CSVHandlerClass import GenericCSVHandler
 
 FIDO_CSV = """"info.status","info.time","info.puid","info.formatname","info.signaturename","info.filesize","info.filename","info.mimetype","info.matchtype"
 OK,203,fmt/729,"SQLite Database File Format","SQLite Database",249856,"data/🖤opf-test-corpus-droid-analysis.db","application/x-sqlite3","signature"

@@ -3,14 +3,7 @@
 import io
 import sys
 
-try:
-    from sqlitefid.src.sqlitefid.libs.CSVHandlerClass import GenericCSVHandler
-except ModuleNotFoundError:
-    # Needed when imported as submodule via demystify.
-    from src.demystify.sqlitefid.src.sqlitefid.libs.CSVHandlerClass import (
-        GenericCSVHandler,
-    )
-
+from src.sqlitefid.libs.CSVHandlerClass import GenericCSVHandler
 
 DROID_CSV = """"ID","PARENT_ID","URI","FILE_PATH","NAME","METHOD","STATUS","SIZE","TYPE","EXT","LAST_MODIFIED","EXTENSION_MISMATCH","SHA1_HASH","FORMAT_COUNT","PUID","MIME_TYPE","FORMAT_NAME","FORMAT_VERSION"
 "2","0","file:////10.1.4.222/gda/archives-sample-files/opf-format-corpus/format-corpus/","\\10.1.4.222\\gda\archives-sample-files\\opf-format-corpus\format-corpus","🖤format-corpus",,"Done","","Folder",,"2014-02-28T15:49:11","false",,"",,"","",""

@@ -16,7 +16,13 @@ code runner.
 import logging
 import tempfile
 
-from .CSVHandlerClass import GenericCSVHandler
+try:
+    from libs.CSVHandlerClass import GenericCSVHandler
+except ModuleNotFoundError:
+    try:
+        from src.sqlitefid.libs.CSVHandlerClass import GenericCSVHandler
+    except ModuleNotFoundError:
+        from sqlitefid.libs.CSVHandlerClass import GenericCSVHandler
 
 
 class FidoLoader:

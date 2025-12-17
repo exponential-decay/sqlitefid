@@ -9,9 +9,16 @@
 into the sqlite db.
 """
 
-# Required imports for main from root.
-from .SFHandlerClass import SFYAMLHandler
-from .ToolMappingClass import ToolMapping
+try:
+    from libs.SFHandlerClass import SFYAMLHandler
+    from libs.ToolMappingClass import ToolMapping
+except ModuleNotFoundError:
+    try:
+        from src.sqlitefid.libs.SFHandlerClass import SFYAMLHandler
+        from src.sqlitefid.libs.ToolMappingClass import ToolMapping
+    except ModuleNotFoundError:
+        from sqlitefid.libs.SFHandlerClass import SFYAMLHandler
+        from sqlitefid.libs.ToolMappingClass import ToolMapping
 
 
 class SFLoader:

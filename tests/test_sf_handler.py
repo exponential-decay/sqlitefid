@@ -1,13 +1,6 @@
 # -*- coding: utf-8 -*-
 
-try:
-    from sqlitefid.src.sqlitefid.libs.SFHandlerClass import IDResult, SFYAMLHandler
-except ModuleNotFoundError:
-    # Needed when imported as submodule via demystify.
-    from src.demystify.sqlitefid.src.sqlitefid.libs.SFHandlerClass import (
-        IDResult,
-        SFYAMLHandler,
-    )
+from src.sqlitefid.libs.SFHandlerClass import IDResult, SFYAMLHandler
 
 SIEGFRIED_YAML = """---
 siegfried   : 1.9.1
