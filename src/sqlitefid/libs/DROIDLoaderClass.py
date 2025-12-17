@@ -11,17 +11,22 @@ DROID data into the sqlite db.
 
 import logging
 from sqlite3 import OperationalError
+import os
 
-try:
-    from libs.CSVHandlerClass import DroidCSVHandler
-    from libs.ToolMappingClass import ToolMapping
-except ModuleNotFoundError:
+if os.name != "nt":
     try:
-        from src.sqlitefid.libs.CSVHandlerClass import DroidCSVHandler
-        from src.sqlitefid.libs.ToolMappingClass import ToolMapping
+        from libs.CSVHandlerClass import DroidCSVHandler
+        from libs.ToolMappingClass import ToolMapping
     except ModuleNotFoundError:
-        from sqlitefid.libs.CSVHandlerClass import DroidCSVHandler
-        from sqlitefid.libs.ToolMappingClass import ToolMapping
+        try:
+            from src.sqlitefid.libs.CSVHandlerClass import DroidCSVHandler
+            from src.sqlitefid.libs.ToolMappingClass import ToolMapping
+        except ModuleNotFoundError:
+            from sqlitefid.libs.CSVHandlerClass import DroidCSVHandler
+            from sqlitefid.libs.ToolMappingClass import ToolMapping
+else:
+    from .CSVHandlerClass import DroidCSVHandler
+    from .ToolMappingClass import ToolMapping
 
 
 class DROIDLoader:

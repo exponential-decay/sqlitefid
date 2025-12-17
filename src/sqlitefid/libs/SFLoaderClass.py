@@ -9,16 +9,22 @@
 into the sqlite db.
 """
 
-try:
-    from libs.SFHandlerClass import SFYAMLHandler
-    from libs.ToolMappingClass import ToolMapping
-except ModuleNotFoundError:
+import os
+
+if os.name != "nt":
     try:
-        from src.sqlitefid.libs.SFHandlerClass import SFYAMLHandler
-        from src.sqlitefid.libs.ToolMappingClass import ToolMapping
+        from libs.SFHandlerClass import SFYAMLHandler
+        from libs.ToolMappingClass import ToolMapping
     except ModuleNotFoundError:
-        from sqlitefid.libs.SFHandlerClass import SFYAMLHandler
-        from sqlitefid.libs.ToolMappingClass import ToolMapping
+        try:
+            from src.sqlitefid.libs.SFHandlerClass import SFYAMLHandler
+            from src.sqlitefid.libs.ToolMappingClass import ToolMapping
+        except ModuleNotFoundError:
+            from sqlitefid.libs.SFHandlerClass import SFYAMLHandler
+            from sqlitefid.libs.ToolMappingClass import ToolMapping
+else:
+    from .SFHandlerClass import SFYAMLHandler
+    from .ToolMappingClass import ToolMapping
 
 
 class SFLoader:
