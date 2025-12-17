@@ -13,17 +13,22 @@ Handles the CSV inputs for demystify.
 import logging
 import os.path
 from urllib.parse import urlparse
+import os
 
-try:
-    from libs import unicodecsv
-    from libs.PyDateHandler import PyDateHandler
-except ModuleNotFoundError:
+if os.name != "nt":
     try:
-        from src.sqlitefid.libs import unicodecsv
-        from src.sqlitefid.libs.PyDateHandler import PyDateHandler
+        from libs import unicodecsv
+        from libs.PyDateHandler import PyDateHandler
     except ModuleNotFoundError:
-        from sqlitefid.libs import unicodecsv
-        from sqlitefid.libs.PyDateHandler import PyDateHandler
+        try:
+            from src.sqlitefid.libs import unicodecsv
+            from src.sqlitefid.libs.PyDateHandler import PyDateHandler
+        except ModuleNotFoundError:
+            from sqlitefid.libs import unicodecsv
+            from sqlitefid.libs.PyDateHandler import PyDateHandler
+else:
+    from . import unicodecsv
+    from .PyDateHandler import PyDateHandler
 
 
 class CSVExportException(Exception):

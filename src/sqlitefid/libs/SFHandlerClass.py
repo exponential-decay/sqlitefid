@@ -16,14 +16,18 @@ import io
 import logging
 import ntpath
 import os.path
+import os
 
-try:
-    from libs.PyDateHandler import PyDateHandler
-except ModuleNotFoundError:
+if os.name != "nt":
     try:
-        from src.sqlitefid.libs.PyDateHandler import PyDateHandler
+        from libs.PyDateHandler import PyDateHandler
     except ModuleNotFoundError:
-        from sqlitefid.libs.PyDateHandler import PyDateHandler
+        try:
+            from src.sqlitefid.libs.PyDateHandler import PyDateHandler
+        except ModuleNotFoundError:
+            from sqlitefid.libs.PyDateHandler import PyDateHandler
+else:
+    from .PyDateHandler import PyDateHandler
 
 
 class SFYAMLHandler:
